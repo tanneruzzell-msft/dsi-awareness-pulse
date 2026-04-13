@@ -187,6 +187,7 @@
         <button class="tab-btn" data-tab="reddit">💬 Reddit</button>
         <button class="tab-btn" data-tab="linkedin">💼 LinkedIn</button>
         <button class="tab-btn" data-tab="add">➕ Add Entry</button>
+        <button class="tab-btn" data-tab="benchmark">🏆 Benchmark</button>
         <button class="tab-btn" data-tab="history">📊 History</button>
         <button class="tab-btn" data-tab="methodology">✅ Methodology</button>
     </div>
@@ -256,6 +257,27 @@
                 <div><button class="btn primary" onclick="addEntry()" style="margin-top:18px">Add</button></div>
             </div>
             <p id="add-result" style="margin-top:12px;font-size:13px"></p>
+        </div>
+    </div>
+
+    <!-- Benchmark -->
+    <div class="tab-panel" id="panel-benchmark">
+        <div class="card">
+            <h2>Competitive Awareness Benchmark</h2>
+            <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px">Same signals measured across competitors: Reddit mentions, Google Trends interest, engagement score. Sorted by awareness.</p>
+            <div class="chart-wrap" style="height:350px"><canvas id="benchmark-chart"></canvas></div>
+        </div>
+        <div class="card">
+            <h2>Detailed Comparison</h2>
+            <table>
+                <thead><tr><th>Product</th><th>Reddit Posts</th><th>Reddit Score</th><th>Trends Avg</th><th>Awareness</th><th>Gap vs DSI</th></tr></thead>
+                <tbody id="benchmark-tbody"></tbody>
+            </table>
+            <p style="color:var(--text-muted);font-size:11px;margin-top:12px">Benchmark data collected via PullPush (Reddit archive) + Google Trends. Run <code>python benchmark.py</code> to refresh.</p>
+        </div>
+        <div class="card">
+            <h2>Where DSI Can Close the Gap</h2>
+            <div id="benchmark-insights"></div>
         </div>
     </div>
 
@@ -455,6 +477,106 @@ function renderHistory() {
     ).join('');
 }
 
+// --- Benchmark ---
+
+let BENCHMARK = {};
+
+async function loadBenchmark() {
+    try {
+        const resp = await fetch('/api/benchmark');
+        BENCHMARK = await resp.json();
+        renderBenchmark();
+    } catch(e) {}
+}
+
+function renderBenchmark() {
+    const comps = BENCHMARK.competitors || {};
+    const names = Object.keys(comps);
+    if (names.length === 0) return;
+
+    // Sort by awareness descending
+    const sorted = names.sort((a, b) => (comps[b].awareness_pct || 0) - (comps[a].awareness_pct || 0));
+    const dsiData = comps['DSI (Purview)'] || {};
+
+    // Bar chart
+    const colors = sorted.map(n => n === 'DSI (Purview)' ? '#5b9aff' : '#3b3f4f');
+    const borderColors = sorted.map(n => n === 'DSI (Purview)' ? '#5b9aff' : '#555a6e');
+
+    const ctx = document.getElementById('benchmark-chart');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: sorted,
+            datasets: [
+                {
+                    label: 'Reddit Posts',
+                    data: sorted.map(n => comps[n].reddit_posts || 0),
+                    backgroundColor: sorted.map(n => n === 'DSI (Purview)' ? '#fb923c' : '#4a3520'),
+                    borderColor: sorted.map(n => n === 'DSI (Purview)' ? '#fb923c' : '#6b5030'),
+                    borderWidth: 1
+                },
+                {
+                    label: 'Google Trends Avg',
+                    data: sorted.map(n => comps[n].trends_avg || 0),
+                    backgroundColor: sorted.map(n => n === 'DSI (Purview)' ? '#5b9aff' : '#1f2a3f'),
+                    borderColor: sorted.map(n => n === 'DSI (Purview)' ? '#5b9aff' : '#3a4a6f'),
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            indexAxis: 'y',
+            scales: {
+                x: { grid: { color: '#2d3140' }, ticks: { color: '#8891a4' }, stacked: false },
+                y: { grid: { color: '#2d3140' }, ticks: { color: '#e8ecf4', font: { size: 13, weight: n => n === 'DSI (Purview)' ? '700' : '400' } } }
+            },
+            plugins: { legend: { labels: { color: '#e8ecf4' } } }
+        }
+    });
+
+    // Table
+    const tbody = document.getElementById('benchmark-tbody');
+    tbody.innerHTML = sorted.map(name => {
+        const c = comps[name];
+        const isDSI = name === 'DSI (Purview)';
+        const gap = isDSI ? '—' : `${c.reddit_posts - (dsiData.reddit_posts || 0)} posts, ${(c.trends_avg || 0) - (dsiData.trends_avg || 0)} trends pts`;
+        const style = isDSI ? ' style="background:var(--surface2);font-weight:600"' : '';
+        const highlight = isDSI ? ' ← you' : '';
+        return `<tr${style}>
+            <td>${name}${highlight}</td>
+            <td>${c.reddit_posts}</td>
+            <td>${c.reddit_score}</td>
+            <td>${c.trends_avg}</td>
+            <td>${c.awareness_pct}%</td>
+            <td style="color:var(--text-muted);font-size:12px">${gap}</td>
+        </tr>`;
+    }).join('');
+
+    // Insights
+    const insights = document.getElementById('benchmark-insights');
+    const redditGap = Math.max(...sorted.filter(n => n !== 'DSI (Purview)').map(n => comps[n].reddit_posts)) - (dsiData.reddit_posts || 0);
+    const trendsAvg = sorted.filter(n => n !== 'DSI (Purview)').reduce((sum, n) => sum + (comps[n].trends_avg || 0), 0) / (sorted.length - 1);
+    const dsiTrends = dsiData.trends_avg || 0;
+
+    const closestAbove = sorted.filter(n => n !== 'DSI (Purview)' && (comps[n].awareness_pct || 0) > (dsiData.awareness_pct || 0))
+        .sort((a, b) => (comps[a].awareness_pct || 0) - (comps[b].awareness_pct || 0))[0];
+    const closestData = closestAbove ? comps[closestAbove] : null;
+
+    insights.innerHTML = `
+        <table style="margin-top:8px"><tbody>
+            <tr><td style="width:160px;color:var(--text-muted)">Biggest gap</td>
+                <td><strong>Reddit presence.</strong> DSI has ${dsiData.reddit_posts || 0} posts vs competitor avg of ${Math.round(sorted.filter(n=>n!=='DSI (Purview)').reduce((s,n)=>s+(comps[n].reddit_posts||0),0)/(sorted.length-1))}. One organic r/sysadmin or r/cybersecurity post with good engagement would meaningfully move your score.</td></tr>
+            <tr><td style="color:var(--text-muted)">Trends comparison</td>
+                <td>DSI trends interest (${dsiTrends}) is ${dsiTrends >= trendsAvg ? 'at or above' : 'below'} competitor avg (${Math.round(trendsAvg)}). ${dsiTrends >= trendsAvg ? 'Search curiosity exists — the conversion to community discussion is the gap.' : 'Both search interest and community presence need work.'}</td></tr>
+            ${closestData ? `<tr><td style="color:var(--text-muted)">Next target</td>
+                <td>Closest competitor above you: <strong>${closestAbove}</strong> at ${closestData.awareness_pct}%. Gap: ${closestData.reddit_posts - (dsiData.reddit_posts||0)} Reddit posts and ${closestData.trends_avg - dsiTrends} trends points.</td></tr>` : ''}
+            <tr><td style="color:var(--text-muted)">Quick win</td>
+                <td>A single well-received Reddit post (like a "How I investigated a breach with DSI" story on r/sysadmin) could add 10-20 posts worth of engagement through comments and cross-posts.</td></tr>
+        </tbody></table>
+    `;
+}
+
 // --- Actions ---
 
 async function flagEntry(id) {
@@ -528,6 +650,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 });
 
 loadData();
+loadBenchmark();
 </script>
 </body>
 </html>

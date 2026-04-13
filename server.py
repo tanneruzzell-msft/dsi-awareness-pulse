@@ -335,6 +335,15 @@ def api_learned():
     return jsonify(learned)
 
 
+@app.route("/api/benchmark")
+def api_benchmark():
+    """Return competitive benchmark data."""
+    bench_path = SCRIPT_DIR / "benchmark.json"
+    if bench_path.exists():
+        return jsonify(load_json(bench_path))
+    return jsonify({"competitors": {}})
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--port", type=int, default=5100)

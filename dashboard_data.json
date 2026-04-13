@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-04-13T12:50:14.149556",
+  "generated_at": "2026-04-13T13:30:52.791395",
   "latest_snapshot": {
-    "id": 9,
+    "id": 10,
     "snapshot_date": "2026-04-13",
-    "total_articles": 12,
-    "third_party_articles": 8,
+    "total_articles": 13,
+    "third_party_articles": 9,
     "microsoft_articles": 4,
     "reddit_mentions": 44,
     "reddit_total_score": 715,
@@ -13,14 +13,14 @@
     "composite_score": 5.88,
     "awareness_pct": 58.8,
     "favorability_pct": 91.7,
-    "notes": "Auto-generated 2026-04-13T12:50:14.145546"
+    "notes": "Auto-generated 2026-04-13T13:30:52.788395"
   },
   "snapshots": [
     {
-      "id": 9,
+      "id": 10,
       "snapshot_date": "2026-04-13",
-      "total_articles": 12,
-      "third_party_articles": 8,
+      "total_articles": 13,
+      "third_party_articles": 9,
       "microsoft_articles": 4,
       "reddit_mentions": 44,
       "reddit_total_score": 715,
@@ -29,10 +29,24 @@
       "composite_score": 5.88,
       "awareness_pct": 58.8,
       "favorability_pct": 91.7,
-      "notes": "Auto-generated 2026-04-13T12:50:14.145546"
+      "notes": "Auto-generated 2026-04-13T13:30:52.788395"
     }
   ],
   "articles": [
+    {
+      "id": "39e71bbbe2cd",
+      "url": "https://www.linkedin.com/posts/test-dsi-awareness-post",
+      "title": "Great overview of Microsoft Purview DSI capabilities",
+      "source": "Jane Smith",
+      "type": "third_party",
+      "sentiment": "unknown",
+      "discovered": "2026-04-13",
+      "last_checked": "2026-04-13",
+      "published_date": null,
+      "flagged": 0,
+      "flag_reason": null,
+      "manually_added": 0
+    },
     {
       "id": "3daf27211dff",
       "url": "https://techcommunity.microsoft.com/blog/microsoft-security-blog/secure-data-as-ai-scales-new-microsoft-purview-innovations-at-rsa-2026/4503665",
@@ -935,7 +949,7 @@
       "discovered": "2026-04-13",
       "search_term": "data security investigations",
       "flagged": 1,
-      "flag_reason": "Oculus/VR - not about DSI",
+      "flag_reason": "Oculus VR not DSI",
       "manually_added": 0
     },
     {
@@ -1072,6 +1086,21 @@
       "flagged": 1,
       "flag_reason": "GIAC GLEG cert - not about Purview DSI",
       "manually_added": 0
+    }
+  ],
+  "linkedin_posts": [
+    {
+      "id": "39e71bbbe2cd",
+      "url": "https://www.linkedin.com/posts/test-dsi-awareness-post",
+      "title": "Great overview of Microsoft Purview DSI capabilities",
+      "author": "Jane Smith",
+      "author_title": null,
+      "post_type": "post",
+      "discovered": "2026-04-13",
+      "published_date": null,
+      "manually_added": 1,
+      "flagged": 0,
+      "flag_reason": null
     }
   ],
   "google_trends": [
@@ -1534,6 +1563,42 @@
   "youtube_videos": [],
   "collection_log": [
     {
+      "id": 24,
+      "run_date": "2026-04-13T13:30:52.783154",
+      "collector": "google_trends",
+      "status": "success",
+      "items_found": 0,
+      "items_new": 0,
+      "error": null
+    },
+    {
+      "id": 23,
+      "run_date": "2026-04-13T13:30:46.005297",
+      "collector": "reddit",
+      "status": "success",
+      "items_found": 60,
+      "items_new": 0,
+      "error": null
+    },
+    {
+      "id": 22,
+      "run_date": "2026-04-13T13:30:27.446227",
+      "collector": "discover_articles",
+      "status": "success",
+      "items_found": 0,
+      "items_new": 0,
+      "error": null
+    },
+    {
+      "id": 21,
+      "run_date": "2026-04-13T13:30:26.053253",
+      "collector": "seed_articles",
+      "status": "success",
+      "items_found": 8,
+      "items_new": 1,
+      "error": null
+    },
+    {
       "id": 20,
       "run_date": "2026-04-13T12:50:14.140553",
       "collector": "google_trends",
@@ -1715,11 +1780,12 @@
     }
   ],
   "summary": {
-    "total_articles": 12,
-    "third_party_articles": 8,
+    "total_articles": 13,
+    "third_party_articles": 9,
     "microsoft_articles": 4,
     "reddit_total": 58,
     "reddit_unique_subs": 32,
+    "linkedin_total": 1,
     "youtube_total": 0,
     "trend_keywords_tracked": 1,
     "snapshots_count": 1
