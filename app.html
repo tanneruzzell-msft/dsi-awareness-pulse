@@ -174,9 +174,9 @@
             <div class="sub" id="sc-reddit-sub">across 0 subreddits</div>
         </div>
         <div class="score-card flagged">
-            <div class="label">Flagged (excluded)</div>
-            <div class="value red" id="sc-flagged">0</div>
-            <div class="sub">false positives removed</div>
+            <div class="label">LinkedIn Posts</div>
+            <div class="value accent" id="sc-linkedin">0</div>
+            <div class="sub">add via ➕ tab</div>
         </div>
     </div>
 
@@ -185,6 +185,7 @@
         <button class="tab-btn active" data-tab="trends">📈 Trends</button>
         <button class="tab-btn" data-tab="articles">📰 Articles</button>
         <button class="tab-btn" data-tab="reddit">💬 Reddit</button>
+        <button class="tab-btn" data-tab="linkedin">💼 LinkedIn</button>
         <button class="tab-btn" data-tab="add">➕ Add Entry</button>
         <button class="tab-btn" data-tab="history">📊 History</button>
         <button class="tab-btn" data-tab="methodology">✅ Methodology</button>
@@ -229,6 +230,15 @@
                 <input type="text" id="filter-reddit-search" placeholder="Search titles..." oninput="renderReddit()" style="width:200px" />
             </div>
             <div id="reddit-content"></div>
+        </div>
+    </div>
+
+    <!-- LinkedIn -->
+    <div class="tab-panel" id="panel-linkedin">
+        <div class="card">
+            <h2>LinkedIn Posts Mentioning DSI</h2>
+            <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px">LinkedIn doesn't have a public search API, so posts are added manually when your team spots them. Use the ➕ tab to add a LinkedIn post URL.</p>
+            <div id="linkedin-content"></div>
         </div>
     </div>
 
@@ -315,10 +325,11 @@ function render() {
     document.getElementById('sc-articles-sub').textContent = `${sum.third_party_articles || 0} third-party, ${sum.microsoft_articles || 0} Microsoft`;
     document.getElementById('sc-reddit').textContent = sum.reddit_total || 0;
     document.getElementById('sc-reddit-sub').textContent = `across ${sum.reddit_unique_subs || 0} subreddits`;
-    document.getElementById('sc-flagged').textContent = sum.total_flagged || 0;
+    document.getElementById('sc-linkedin').textContent = sum.linkedin_total || 0;
 
     renderArticles();
     renderReddit();
+    renderLinkedIn();
     renderTrends();
     renderHistory();
 }
@@ -380,6 +391,25 @@ function renderReddit() {
             if (r.manually_added) badges.push('<span class="badge manual">added</span>');
             const dt = r.created_utc > 0 ? new Date(r.created_utc * 1000).toLocaleDateString() : '—';
             return `<tr${cls}><td>${btn} ${badges.join(' ')}</td><td>r/${r.subreddit}</td><td><a href="${r.url}" target="_blank">${r.title}</a></td><td>${r.score}</td><td>${r.num_comments}</td><td>${dt}</td></tr>`;
+        }).join('') + '</tbody></table>';
+}
+
+function renderLinkedIn() {
+    const el = document.getElementById('linkedin-content');
+    const items = (DATA.linkedin_posts || []);
+
+    if (items.length === 0) {
+        el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted)"><div style="font-size:28px;margin-bottom:8px">💼</div>No LinkedIn posts tracked yet.<br><span style="font-size:12px">Paste a LinkedIn post URL in the ➕ Add Entry tab — the "Source" field becomes the author name.</span></div>';
+        return;
+    }
+
+    el.innerHTML = '<table><thead><tr><th></th><th>Title / Content</th><th>Author</th><th>Added</th></tr></thead><tbody>' +
+        items.map(p => {
+            const cls = p.flagged ? ' class="flagged"' : '';
+            const btn = p.flagged
+                ? `<button class="flag-btn unflag-btn" onclick="unflagEntry('${p.id}')">↩</button>`
+                : `<button class="flag-btn" onclick="flagEntry('${p.id}')">🚩</button>`;
+            return `<tr${cls}><td>${btn}</td><td><a href="${p.url}" target="_blank">${p.title}</a></td><td>${p.author || '—'}</td><td>${p.discovered}</td></tr>`;
         }).join('') + '</tbody></table>';
 }
 

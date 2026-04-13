@@ -106,6 +106,22 @@ def init_db():
     """)
 
     c.execute("""
+        CREATE TABLE IF NOT EXISTS linkedin_posts (
+            id TEXT PRIMARY KEY,
+            url TEXT UNIQUE,
+            title TEXT,
+            author TEXT,
+            author_title TEXT,
+            post_type TEXT,
+            discovered DATE,
+            published_date TEXT,
+            manually_added INTEGER DEFAULT 0,
+            flagged INTEGER DEFAULT 0,
+            flag_reason TEXT
+        )
+    """)
+
+    c.execute("""
         CREATE TABLE IF NOT EXISTS google_trends (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             keyword TEXT,
@@ -444,6 +460,12 @@ def generate_snapshot(conn):
 
     youtube_count = c.execute("SELECT COUNT(*) FROM youtube_videos").fetchone()[0]
 
+    linkedin_count = 0
+    try:
+        linkedin_count = c.execute("SELECT COUNT(*) FROM linkedin_posts WHERE COALESCE(flagged, 0) = 0").fetchone()[0]
+    except Exception:
+        pass
+
     trends_avg = c.execute(
         "SELECT COALESCE(AVG(interest), 0) FROM google_trends WHERE date >= date('now', '-30 days')"
     ).fetchone()[0]
@@ -521,6 +543,14 @@ def export_dashboard_data(conn):
         "SELECT * FROM youtube_videos ORDER BY discovered DESC"
     ).fetchall()]
 
+    linkedin = []
+    try:
+        linkedin = [dict(r) for r in c.execute(
+            "SELECT * FROM linkedin_posts ORDER BY COALESCE(published_date, discovered) DESC"
+        ).fetchall()]
+    except Exception:
+        pass
+
     logs = [dict(r) for r in c.execute(
         "SELECT * FROM collection_log ORDER BY run_date DESC LIMIT 50"
     ).fetchall()]
@@ -534,6 +564,7 @@ def export_dashboard_data(conn):
         "snapshots": snapshots,
         "articles": articles,
         "reddit_mentions": reddit,
+        "linkedin_posts": linkedin,
         "google_trends": trends,
         "youtube_videos": videos,
         "collection_log": logs,
@@ -543,6 +574,7 @@ def export_dashboard_data(conn):
             "microsoft_articles": len([a for a in articles if a["type"] == "microsoft"]),
             "reddit_total": len(reddit),
             "reddit_unique_subs": len(set(r["subreddit"] for r in reddit)) if reddit else 0,
+            "linkedin_total": len([p for p in linkedin if not p.get("flagged")]),
             "youtube_total": len(videos),
             "trend_keywords_tracked": len(set(t["keyword"] for t in trends)) if trends else 0,
             "snapshots_count": len(snapshots)

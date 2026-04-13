@@ -169,6 +169,11 @@ def api_data():
     snapshots = [dict(r) for r in c.execute("SELECT * FROM pulse_snapshots ORDER BY snapshot_date ASC").fetchall()]
     articles = [dict(r) for r in c.execute("SELECT * FROM articles ORDER BY COALESCE(published_date, discovered) DESC").fetchall()]
     reddit = [dict(r) for r in c.execute("SELECT * FROM reddit_mentions ORDER BY created_utc DESC").fetchall()]
+    linkedin = []
+    try:
+        linkedin = [dict(r) for r in c.execute("SELECT * FROM linkedin_posts ORDER BY COALESCE(published_date, discovered) DESC").fetchall()]
+    except Exception:
+        pass
     trends = [dict(r) for r in c.execute("SELECT keyword, date, interest FROM google_trends ORDER BY date ASC").fetchall()]
     logs = [dict(r) for r in c.execute("SELECT * FROM collection_log ORDER BY run_date DESC LIMIT 50").fetchall()]
 
@@ -180,6 +185,7 @@ def api_data():
         "snapshots": snapshots,
         "articles": articles,
         "reddit_mentions": reddit,
+        "linkedin_posts": linkedin,
         "google_trends": trends,
         "collection_log": logs,
         "summary": {
@@ -189,6 +195,7 @@ def api_data():
             "reddit_total": len([r for r in reddit if not r.get("flagged")]),
             "reddit_flagged": len([r for r in reddit if r.get("flagged")]),
             "reddit_unique_subs": len(set(r["subreddit"] for r in reddit if not r.get("flagged"))) if reddit else 0,
+            "linkedin_total": len([p for p in linkedin if not p.get("flagged")]),
             "youtube_total": 0,
             "trend_keywords_tracked": len(set(t["keyword"] for t in trends)) if trends else 0,
             "snapshots_count": len(snapshots),
@@ -213,6 +220,12 @@ def api_flag():
     if not entry:
         entry = conn.execute("SELECT * FROM reddit_mentions WHERE id = ?", (entry_id,)).fetchone()
         table = "reddit_mentions"
+    if not entry:
+        try:
+            entry = conn.execute("SELECT * FROM linkedin_posts WHERE id = ?", (entry_id,)).fetchone()
+            table = "linkedin_posts"
+        except Exception:
+            pass
 
     cur = conn.execute(f"UPDATE {table} SET flagged = 1, flag_reason = ? WHERE id = ?", (reason, entry_id))
     conn.commit()
@@ -233,6 +246,10 @@ def api_unflag():
     conn = get_db()
     conn.execute("UPDATE articles SET flagged = 0, flag_reason = NULL WHERE id = ?", (entry_id,))
     conn.execute("UPDATE reddit_mentions SET flagged = 0, flag_reason = NULL WHERE id = ?", (entry_id,))
+    try:
+        conn.execute("UPDATE linkedin_posts SET flagged = 0, flag_reason = NULL WHERE id = ?", (entry_id,))
+    except Exception:
+        pass
     conn.commit()
     conn.close()
     return jsonify({"ok": True, "id": entry_id})
@@ -262,6 +279,7 @@ def api_add():
         return jsonify({"ok": False, "error": "Already tracked"})
 
     is_reddit = "reddit.com" in url
+    is_linkedin = "linkedin.com" in url
     subreddit = None
     if is_reddit:
         # Extract subreddit from URL
@@ -271,6 +289,16 @@ def api_add():
         conn.execute(
             "INSERT INTO reddit_mentions (id, subreddit, title, url, author, score, num_comments, created_utc, discovered, search_term, manually_added) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
             (aid, subreddit or source, title, url, "", 0, 0, 0, datetime.now().strftime("%Y-%m-%d"), "manual", 1)
+        )
+    elif is_linkedin:
+        # Ensure table exists
+        conn.execute("""CREATE TABLE IF NOT EXISTS linkedin_posts (
+            id TEXT PRIMARY KEY, url TEXT UNIQUE, title TEXT, author TEXT, author_title TEXT,
+            post_type TEXT, discovered DATE, published_date TEXT,
+            manually_added INTEGER DEFAULT 0, flagged INTEGER DEFAULT 0, flag_reason TEXT)""")
+        conn.execute(
+            "INSERT INTO linkedin_posts (id, url, title, author, post_type, discovered, published_date, manually_added) VALUES (?,?,?,?,?,?,?,?)",
+            (aid, url, title, source, "post", datetime.now().strftime("%Y-%m-%d"), published, 1)
         )
     else:
         conn.execute(

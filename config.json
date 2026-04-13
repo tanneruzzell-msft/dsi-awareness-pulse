@@ -69,6 +69,14 @@
             "type": "microsoft",
             "sentiment": "positive",
             "discovered": "2026-04-07"
+        },
+        {
+            "url": "https://www.linkedin.com/posts/test-dsi-awareness-post",
+            "title": "Great overview of Microsoft Purview DSI capabilities",
+            "source": "Jane Smith",
+            "type": "third_party",
+            "sentiment": "unknown",
+            "discovered": "2026-04-13"
         }
     ],
     "competitors": [

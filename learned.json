@@ -2,6 +2,8 @@
     "exclude_title_patterns": [],
     "exclude_subreddits": [],
     "include_subreddits": [],
-    "include_sources": [],
+    "include_sources": [
+        "Jane Smith"
+    ],
     "notes": "Auto-updated by the dashboard when you flag or add entries. The collector reads this to improve future runs."
 }
