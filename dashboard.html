@@ -198,6 +198,54 @@
         }
 
         .refresh-btn:hover { opacity: 0.9; }
+
+        .flag-btn {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 2px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .flag-btn:hover { border-color: var(--red); color: var(--red); }
+        .flag-btn.unflag:hover { border-color: var(--green); color: var(--green); }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--surface);
+            border: 1px solid var(--green);
+            color: var(--text);
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+            max-width: 500px;
+        }
+        .toast.show { opacity: 1; }
+        .toast code { background: var(--bg); padding: 2px 6px; border-radius: 3px; font-size: 12px; }
+
+        .flag-queue-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            padding: 10px 24px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 999;
+            font-size: 13px;
+        }
+        .flag-queue-bar.show { display: flex; }
+        .flag-queue-bar button { margin-left: 12px; }
     </style>
 </head>
 <body>
@@ -267,7 +315,7 @@
             <h2>All Tracked Articles</h2>
             <table>
                 <thead>
-                    <tr><th>ID</th><th>Title</th><th>Source</th><th>Type</th><th>Sentiment</th><th>Published</th><th>Status</th></tr>
+                    <tr><th>Action</th><th>Title</th><th>Source</th><th>Type</th><th>Sentiment</th><th>Published</th></tr>
                 </thead>
                 <tbody id="articles-table"></tbody>
             </table>
@@ -431,17 +479,19 @@
                 return;
             }
             tbody.innerHTML = DATA.articles.map(a => {
-                const flagged = a.flagged ? ' style="opacity:0.4;text-decoration:line-through"' : '';
-                const status = a.flagged ? `<span class="badge negative" title="${a.flag_reason || ''}">flagged</span>` : (a.manually_added ? '<span class="badge positive">manual</span>' : '');
+                const flagged = a.flagged ? ' style="opacity:0.4"' : '';
+                const flagBtn = a.flagged
+                    ? `<button class="flag-btn unflag" onclick="copyCmd('unflag','${a.id}')" title="Copy unflag command">↩ unflag</button>`
+                    : `<button class="flag-btn" onclick="flagEntry('${a.id}','article')" title="Flag as false positive">🚩</button>`;
+                const statusBadge = a.flagged ? `<span class="badge negative" title="${a.flag_reason || ''}">${a.flag_reason || 'flagged'}</span> ` : (a.manually_added ? '<span class="badge positive">manual</span> ' : '');
                 return `
                 <tr${flagged}>
-                    <td><code style="font-size:11px;color:var(--text-muted)">${a.id}</code></td>
+                    <td>${statusBadge}${flagBtn}</td>
                     <td><a href="${a.url}" target="_blank">${a.title}</a></td>
                     <td>${a.source}</td>
                     <td><span class="badge ${a.type}">${a.type === 'third_party' ? '3rd Party' : 'Microsoft'}</span></td>
                     <td><span class="badge ${a.sentiment}">${a.sentiment}</span></td>
                     <td>${a.published_date || '—'}</td>
-                    <td>${status}</td>
                 </tr>`;
             }).join('');
         }
@@ -452,19 +502,21 @@
                 el.innerHTML = `<div class="empty-state"><div class="emoji">🔇</div><p>No Reddit mentions found</p><p style="font-size:12px">This is actually useful data — DSI has zero organic Reddit presence.</p></div>`;
                 return;
             }
-            el.innerHTML = '<table><thead><tr><th>ID</th><th>Subreddit</th><th>Title</th><th>Score</th><th>Comments</th><th>Date</th><th>Status</th></tr></thead><tbody>' +
+            el.innerHTML = '<table><thead><tr><th>Action</th><th>Subreddit</th><th>Title</th><th>Score</th><th>Comments</th><th>Date</th></tr></thead><tbody>' +
                 DATA.reddit_mentions.map(r => {
-                    const flagged = r.flagged ? ' style="opacity:0.4;text-decoration:line-through"' : '';
-                    const status = r.flagged ? `<span class="badge negative" title="${r.flag_reason || ''}">flagged</span>` : (r.manually_added ? '<span class="badge positive">manual</span>' : '');
+                    const flagged = r.flagged ? ' style="opacity:0.4"' : '';
+                    const flagBtn = r.flagged
+                        ? `<button class="flag-btn unflag" onclick="copyCmd('unflag','${r.id}')" title="Copy unflag command">↩ unflag</button>`
+                        : `<button class="flag-btn" onclick="flagEntry('${r.id}','reddit')" title="Flag as false positive">🚩</button>`;
+                    const statusBadge = r.flagged ? `<span class="badge negative" title="${r.flag_reason || ''}">${r.flag_reason || 'flagged'}</span> ` : (r.manually_added ? '<span class="badge positive">manual</span> ' : '');
                     return `
                     <tr${flagged}>
-                        <td><code style="font-size:11px;color:var(--text-muted)">${r.id}</code></td>
+                        <td>${statusBadge}${flagBtn}</td>
                         <td>r/${r.subreddit}</td>
                         <td><a href="${r.url}" target="_blank">${r.title}</a></td>
                         <td>${r.score}</td>
                         <td>${r.num_comments}</td>
                         <td>${new Date(r.created_utc * 1000).toLocaleDateString()}</td>
-                        <td>${status}</td>
                     </tr>`;
                 }).join('') + '</tbody></table>';
         }
@@ -607,6 +659,71 @@
             `;
         }
 
+        // Flag queue
+        let flagQueue = [];
+
+        function flagEntry(id, type) {
+            const reason = prompt('Why is this a false positive? (or leave blank)') ?? '';
+            if (reason === null) return; // cancelled
+
+            flagQueue.push({ id, type, reason: reason || 'false positive' });
+            updateFlagQueueBar();
+
+            // Visual feedback - dim the row
+            const row = event.target.closest('tr');
+            if (row) row.style.opacity = '0.3';
+
+            showToast(`Queued flag for ${id}. Click "Apply All" in the bottom bar to generate the command.`);
+        }
+
+        function copyCmd(action, id) {
+            const cmd = `python curate.py ${action} --id ${id}`;
+            navigator.clipboard.writeText(cmd).then(() => {
+                showToast(`Copied: <code>${cmd}</code>`);
+            }).catch(() => {
+                showToast(`Command: <code>${cmd}</code> (copy manually)`);
+            });
+        }
+
+        function updateFlagQueueBar() {
+            const bar = document.getElementById('flag-queue-bar');
+            const count = document.getElementById('flag-queue-count');
+            if (flagQueue.length > 0) {
+                bar.classList.add('show');
+                count.textContent = flagQueue.length;
+            } else {
+                bar.classList.remove('show');
+            }
+        }
+
+        function applyFlagQueue() {
+            const cmds = flagQueue.map(f =>
+                `python curate.py flag --id ${f.id} --reason "${f.reason}"`
+            ).join('\n');
+
+            navigator.clipboard.writeText(cmds).then(() => {
+                showToast(`Copied ${flagQueue.length} flag commands to clipboard! Paste into your terminal, then run refresh-pulse.ps1`);
+            }).catch(() => {
+                // Fallback: show in a prompt
+                prompt('Copy these commands and paste into your terminal:', cmds);
+            });
+        }
+
+        function clearFlagQueue() {
+            flagQueue = [];
+            updateFlagQueueBar();
+            // Re-render to reset opacity
+            renderArticles();
+            renderReddit();
+        }
+
+        function showToast(html) {
+            const t = document.getElementById('toast');
+            t.innerHTML = html;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 4000);
+        }
+
         // Tab switching
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
@@ -619,5 +736,14 @@
 
         loadData();
     </script>
+
+    <div class="toast" id="toast"></div>
+    <div class="flag-queue-bar" id="flag-queue-bar">
+        <span>🚩 <strong><span id="flag-queue-count">0</span></strong> entries queued for flagging</span>
+        <span>
+            <button class="flag-btn unflag" onclick="clearFlagQueue()">Clear</button>
+            <button class="refresh-btn" onclick="applyFlagQueue()">📋 Copy flag commands</button>
+        </span>
+    </div>
 </body>
 </html>
