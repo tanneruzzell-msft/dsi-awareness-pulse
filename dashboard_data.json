@@ -1,35 +1,35 @@
 {
-  "generated_at": "2026-04-13T12:05:13.780347",
+  "generated_at": "2026-04-13T12:22:16.674882",
   "latest_snapshot": {
-    "id": 3,
+    "id": 4,
     "snapshot_date": "2026-04-13",
     "total_articles": 12,
     "third_party_articles": 8,
     "microsoft_articles": 4,
-    "reddit_mentions": 0,
-    "reddit_total_score": 0,
+    "reddit_mentions": 12,
+    "reddit_total_score": 69,
     "youtube_videos": 0,
     "google_trends_avg": 9,
-    "composite_score": 3.88,
-    "awareness_pct": 38.8,
+    "composite_score": 5.88,
+    "awareness_pct": 58.8,
     "favorability_pct": 91.7,
-    "notes": "Auto-generated 2026-04-13T11:32:39.899426"
+    "notes": "Auto-generated 2026-04-13T12:22:16.669882"
   },
   "snapshots": [
     {
-      "id": 3,
+      "id": 4,
       "snapshot_date": "2026-04-13",
       "total_articles": 12,
       "third_party_articles": 8,
       "microsoft_articles": 4,
-      "reddit_mentions": 0,
-      "reddit_total_score": 0,
+      "reddit_mentions": 12,
+      "reddit_total_score": 69,
       "youtube_videos": 0,
       "google_trends_avg": 9,
-      "composite_score": 3.88,
-      "awareness_pct": 38.8,
+      "composite_score": 5.88,
+      "awareness_pct": 58.8,
       "favorability_pct": 91.7,
-      "notes": "Auto-generated 2026-04-13T11:32:39.899426"
+      "notes": "Auto-generated 2026-04-13T12:22:16.669882"
     }
   ],
   "articles": [
@@ -166,7 +166,152 @@
       "published_date": "2025-10-15"
     }
   ],
-  "reddit_mentions": [],
+  "reddit_mentions": [
+    {
+      "id": "9d17e7d55965",
+      "subreddit": "microsoft365",
+      "title": "Microsoft purview data security investigations",
+      "url": "https://reddit.com/r/microsoft365/comments/1kcit19/microsoft_purview_data_security_investigations/",
+      "author": "Prudent_Strategy_530",
+      "score": 1,
+      "num_comments": 0,
+      "created_utc": 1746131418.0,
+      "discovered": "2026-04-13",
+      "search_term": "data security investigations"
+    },
+    {
+      "id": "49afb9807979",
+      "subreddit": "msp",
+      "title": "Whats new in Microsoft 365 | April Updates",
+      "url": "https://reddit.com/r/msp/comments/1k9x6aj/whats_new_in_microsoft_365_april_updates/",
+      "author": "msp4msps",
+      "score": 1,
+      "num_comments": 0,
+      "created_utc": 1745851205.0,
+      "discovered": "2026-04-13",
+      "search_term": "data security investigations"
+    },
+    {
+      "id": "23990cf3d60d",
+      "subreddit": "msp",
+      "title": "April 2025 Microsoft 365 Changes: What's New and What's Gone?",
+      "url": "https://reddit.com/r/msp/comments/1jouaop/april_2025_microsoft_365_changes_whats_new_and/",
+      "author": "First-Position-3868",
+      "score": 1,
+      "num_comments": 0,
+      "created_utc": 1743510327.0,
+      "discovered": "2026-04-13",
+      "search_term": "data security investigations"
+    },
+    {
+      "id": "47cedbfe101d",
+      "subreddit": "sysadmin",
+      "title": "April 2025 Microsoft 365 Changes: What's New and What's Gone?",
+      "url": "https://reddit.com/r/sysadmin/comments/1jot7ou/april_2025_microsoft_365_changes_whats_new_and/",
+      "author": "First-Position-3868",
+      "score": 1,
+      "num_comments": 0,
+      "created_utc": 1743506755.0,
+      "discovered": "2026-04-13",
+      "search_term": "data security investigations"
+    },
+    {
+      "id": "e4e9e02c9323",
+      "subreddit": "pwnhub",
+      "title": "Microsoft Strengthens Cybersecurity with New AI Agents in Security Copilot",
+      "url": "https://reddit.com/r/pwnhub/comments/1jjoh0j/microsoft_strengthens_cybersecurity_with_new_ai/",
+      "author": "Dark-Marc",
+      "score": 1,
+      "num_comments": 0,
+      "created_utc": 1742922509.0,
+      "discovered": "2026-04-13",
+      "search_term": "data security investigations"
+    },
+    {
+      "id": "2fc6c765ea09",
+      "subreddit": "ITCareerQuestions",
+      "title": "Guide to job role certification",
+      "url": "https://reddit.com/r/ITCareerQuestions/comments/1fa5gtx/guide_to_job_role_certification/",
+      "author": "Loyaltyabov3al",
+      "score": 1,
+      "num_comments": 0,
+      "created_utc": 1725593022.0,
+      "discovered": "2026-04-13",
+      "search_term": "data security investigations"
+    },
+    {
+      "id": "656562fac4ce",
+      "subreddit": "cybermaterial",
+      "title": "\ud83d\uddd2\ufe0fFind 8 courses &amp; certifications about Online Privacy:",
+      "url": "https://reddit.com/r/cybermaterial/comments/10bz94l/find_8_courses_certifications_about_online_privacy/",
+      "author": "AutoModerator",
+      "score": 1,
+      "num_comments": 0,
+      "created_utc": 1673730016.0,
+      "discovered": "2026-04-13",
+      "search_term": "data security investigations"
+    },
+    {
+      "id": "7be18a0b85d8",
+      "subreddit": "OculusQuest",
+      "title": "Verify developer accounts? So if we don't does that mean we can't disable guardian anymore?",
+      "url": "https://reddit.com/r/OculusQuest/comments/iqeoyf/verify_developer_accounts_so_if_we_dont_does_that/",
+      "author": "oldeastvan",
+      "score": 12,
+      "num_comments": 22,
+      "created_utc": 1599779621.0,
+      "discovered": "2026-04-13",
+      "search_term": "data security investigations"
+    },
+    {
+      "id": "4d3a8c94f90e",
+      "subreddit": "sidequest",
+      "title": "Got this email from Oculus this afternoon, what does this mean for me?",
+      "url": "https://reddit.com/r/sidequest/comments/iqddbr/got_this_email_from_oculus_this_afternoon_what/",
+      "author": "SirEdwardthe4th",
+      "score": 34,
+      "num_comments": 23,
+      "created_utc": 1599775284.0,
+      "discovered": "2026-04-13",
+      "search_term": "data security investigations"
+    },
+    {
+      "id": "c7b2e6aae879",
+      "subreddit": "Netwrix",
+      "title": "Top 12 Security Solutions to Protect Your Data",
+      "url": "https://reddit.com/r/Netwrix/comments/di51z6/top_12_security_solutions_to_protect_your_data/",
+      "author": "Jeff-Netwrix",
+      "score": 1,
+      "num_comments": 0,
+      "created_utc": 1571129548.0,
+      "discovered": "2026-04-13",
+      "search_term": "data security investigations"
+    },
+    {
+      "id": "4dbbcd23ec51",
+      "subreddit": "netsecstudents",
+      "title": "Does anyone here have the GIAC GLEG (Law of Data Security and Investigations) certification?",
+      "url": "https://reddit.com/r/netsecstudents/comments/6c5kuf/does_anyone_here_have_the_giac_gleg_law_of_data/",
+      "author": "othertomjones",
+      "score": 12,
+      "num_comments": 1,
+      "created_utc": 1495219413.0,
+      "discovered": "2026-04-13",
+      "search_term": "data security investigations"
+    },
+    {
+      "id": "38f6b7de6524",
+      "subreddit": "cyberlaws",
+      "title": "Has anyone taken the GLEG certification (The Law of Data Security and Investigations)?",
+      "url": "https://reddit.com/r/cyberlaws/comments/69yqew/has_anyone_taken_the_gleg_certification_the_law/",
+      "author": "othertomjones",
+      "score": 3,
+      "num_comments": 0,
+      "created_utc": 1494256874.0,
+      "discovered": "2026-04-13",
+      "search_term": "data security investigations"
+    }
+  ],
   "google_trends": [
     {
       "keyword": "data security investigations",
@@ -703,8 +848,8 @@
     "total_articles": 12,
     "third_party_articles": 8,
     "microsoft_articles": 4,
-    "reddit_total": 0,
-    "reddit_unique_subs": 0,
+    "reddit_total": 12,
+    "reddit_unique_subs": 11,
     "youtube_total": 0,
     "trend_keywords_tracked": 1,
     "snapshots_count": 1

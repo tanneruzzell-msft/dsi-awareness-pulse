@@ -295,13 +295,50 @@ def collect_reddit(conn, config):
                 print(f"  Reddit: error on r/{sub} for '{term}': {e}")
 
     if total_found == 0 and not creds.get("client_id"):
-        print("  Reddit: 0 results (API likely blocking). Set up PRAW credentials for reliable access.")
-        print("  Reddit: Go to https://www.reddit.com/prefs/apps → create 'script' app → add to config.json")
+        print("  Reddit: JSON API blocked. Trying PullPush archive...")
+        total_found, new_count = _collect_reddit_pullpush(conn, config)
 
     conn.commit()
     log_collection(conn, "reddit", "success", total_found, new_count)
     print(f"  Reddit: found {total_found} posts, {new_count} new")
     return new_count
+
+
+def _collect_reddit_pullpush(conn, config):
+    """Fallback: use PullPush Reddit archive API (no auth needed, indexes all of Reddit)."""
+    new_count = 0
+    total_found = 0
+    c = conn.cursor()
+
+    for term in config.get("search_terms", []):
+        try:
+            url = f"https://api.pullpush.io/reddit/search/submission/?q={requests.utils.quote(term)}&size=50"
+            resp = requests.get(url, headers=HEADERS, timeout=30)
+            if resp.status_code != 200:
+                print(f"  PullPush: HTTP {resp.status_code} for '{term}'")
+                continue
+
+            posts = resp.json().get("data", [])
+            for p in posts:
+                total_found += 1
+                rid = make_id(p.get("id", str(time.time())))
+                existing = c.execute("SELECT id FROM reddit_mentions WHERE id = ?", (rid,)).fetchone()
+                if not existing:
+                    c.execute(
+                        "INSERT INTO reddit_mentions (id, subreddit, title, url, author, score, num_comments, created_utc, discovered, search_term) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                        (rid, p.get("subreddit", ""), p.get("title", ""),
+                         f"https://reddit.com{p.get('permalink', '')}",
+                         p.get("author", ""), p.get("score", 0), p.get("num_comments", 0),
+                         p.get("created_utc", 0), datetime.now().strftime("%Y-%m-%d"), term)
+                    )
+                    new_count += 1
+
+            time.sleep(2)
+        except Exception as e:
+            print(f"  PullPush: error for '{term}': {e}")
+
+    conn.commit()
+    return total_found, new_count
 
 
 # --- Google Trends Collection ---
