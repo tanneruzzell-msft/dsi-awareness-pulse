@@ -264,13 +264,13 @@
     <div class="tab-panel" id="panel-benchmark">
         <div class="card">
             <h2>Competitive Awareness Benchmark</h2>
-            <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px">Same signals measured across competitors: Reddit mentions, Google Trends interest, engagement score. Sorted by awareness.</p>
+            <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px">Compares Reddit mentions + Google Trends interest across competitors. These are the two signals measurable for everyone. DSI's full score (including articles, MS content) is shown separately on the main dashboard.</p>
             <div class="chart-wrap" style="height:350px"><canvas id="benchmark-chart"></canvas></div>
         </div>
         <div class="card">
             <h2>Detailed Comparison</h2>
             <table>
-                <thead><tr><th>Product</th><th>Reddit Posts</th><th>Reddit Score</th><th>Trends Avg</th><th>Awareness</th><th>Gap vs DSI</th></tr></thead>
+                <thead><tr><th>Product</th><th>Reddit Posts</th><th>Reddit Score</th><th>Trends Avg</th><th>Benchmark Score</th><th>Gap vs DSI</th></tr></thead>
                 <tbody id="benchmark-tbody"></tbody>
             </table>
             <p style="color:var(--text-muted);font-size:11px;margin-top:12px">Benchmark data collected via PullPush (Reddit archive) + Google Trends. Run <code>python benchmark.py</code> to refresh.</p>
@@ -542,13 +542,13 @@ function renderBenchmark() {
         const isDSI = name === 'DSI (Purview)';
         const gap = isDSI ? '—' : `${c.reddit_posts - (dsiData.reddit_posts || 0)} posts, ${(c.trends_avg || 0) - (dsiData.trends_avg || 0)} trends pts`;
         const style = isDSI ? ' style="background:var(--surface2);font-weight:600"' : '';
-        const highlight = isDSI ? ' ← you' : '';
+        const fullScore = isDSI && c.full_awareness_pct ? ` <span style="color:var(--green);font-size:11px">(full: ${c.full_awareness_pct}%)</span>` : '';
         return `<tr${style}>
-            <td>${name}${highlight}</td>
+            <td>${name}${isDSI ? ' ◀' : ''}</td>
             <td>${c.reddit_posts}</td>
             <td>${c.reddit_score}</td>
             <td>${c.trends_avg}</td>
-            <td>${c.awareness_pct}%</td>
+            <td>${c.awareness_pct}%${fullScore}</td>
             <td style="color:var(--text-muted);font-size:12px">${gap}</td>
         </tr>`;
     }).join('');

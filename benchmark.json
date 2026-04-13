@@ -1,61 +1,63 @@
 {
-  "generated_at": "2026-04-13T13:34:36.194930",
+  "generated_at": "2026-04-13T13:46:55.334868",
   "competitors": {
     "DSI (Purview)": {
-      "reddit_posts": 9,
-      "reddit_score": 9,
+      "reddit_posts": 45,
+      "reddit_score": 716,
       "trends_avg": 14,
-      "composite": 3.0,
-      "awareness_pct": 30.0
+      "composite": 5.7,
+      "awareness_pct": 57,
+      "full_awareness_pct": 58.8,
+      "source": "live_db"
     },
     "Relativity": {
       "reddit_posts": 138,
       "reddit_score": 330,
       "trends_avg": 5,
-      "composite": 5.2,
-      "awareness_pct": 52.0
+      "composite": 5.3,
+      "awareness_pct": 53
     },
     "Nuix": {
       "reddit_posts": 53,
       "reddit_score": 342,
       "trends_avg": 35,
       "composite": 6.8,
-      "awareness_pct": 68.0
+      "awareness_pct": 68
     },
     "Everlaw": {
       "reddit_posts": 100,
       "reddit_score": 165,
       "trends_avg": 29,
       "composite": 6.5,
-      "awareness_pct": 64.0
+      "awareness_pct": 65
     },
     "Exterro": {
       "reddit_posts": 45,
       "reddit_score": 93,
       "trends_avg": 15,
       "composite": 5.8,
-      "awareness_pct": 57.0
+      "awareness_pct": 58
     },
     "DTEX": {
       "reddit_posts": 50,
       "reddit_score": 74,
       "trends_avg": 6,
       "composite": 5.3,
-      "awareness_pct": 53.0
+      "awareness_pct": 53
     },
     "Varonis": {
       "reddit_posts": 105,
       "reddit_score": 483,
       "trends_avg": 42,
       "composite": 7.1,
-      "awareness_pct": 71.0
+      "awareness_pct": 71
     },
     "Cyberhaven": {
       "reddit_posts": 70,
       "reddit_score": 70,
       "trends_avg": 14,
       "composite": 5.7,
-      "awareness_pct": 57.0
+      "awareness_pct": 57
     }
   }
 }
