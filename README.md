@@ -124,29 +124,51 @@ If you want to spot-check the data:
 
 ## Sharing the Dashboard
 
-### Option 1: GitHub Pages (recommended for team sharing)
+The GitHub repo is **private** (`tanneruzzell-msft/dsi-awareness-pulse`). GitHub Pages requires a paid plan for private repos, so use one of these options:
 
-The dashboard is published at: **[See URL after push]**
+### Option 1: SharePoint (recommended for team sharing)
 
-To update after a collection run:
-```powershell
-cd ~\Documents\DSI-PM-Vault\dsi-awareness-pulse
-git add pulse.html dashboard_data.json
-git commit -m "Weekly pulse update"
-git push
-```
-
-GitHub Pages will automatically serve the updated dashboard.
-
-### Option 2: SharePoint
-
-1. After running `.\refresh-pulse.ps1`, copy `pulse.html` to your SharePoint site
-2. The file is fully self-contained — no dependencies, no server needed
+1. After running `.\refresh-pulse.ps1`, upload `pulse.html` to your DSI team SharePoint site
+2. The file is fully self-contained (~44KB, no dependencies, no server needed)
 3. Anyone with access to the SharePoint folder can open it in a browser
+4. To update: re-run `.\refresh-pulse.ps1`, re-upload `pulse.html`
 
-### Option 3: Email / Teams
+### Option 2: Teams Channel
 
-`pulse.html` is a single file (~38KB). You can attach it to an email or drop it in a Teams channel. Recipients open it in their browser.
+Drop `pulse.html` directly in a Teams channel (e.g., DSI Customer Acquisition). Team members click to open in browser.
+
+### Option 3: Email
+
+Attach `pulse.html` to a weekly email. Recipients open it in their browser — it works fully offline.
+
+### Option 4: Make the repo public for GitHub Pages
+
+If the team is OK with a public repo (all data is publicly available anyway):
+```powershell
+gh repo edit tanneruzzell-msft/dsi-awareness-pulse --visibility public
+.\publish-pages.ps1
+```
+Dashboard will be live at: `https://tanneruzzell-msft.github.io/dsi-awareness-pulse/`
+
+## Reddit Setup (Required for Accurate Reddit Data)
+
+Reddit blocks unauthenticated API access. To get real Reddit data:
+
+1. Go to [reddit.com/prefs/apps](https://www.reddit.com/prefs/apps)
+2. Click "create another app" at the bottom
+3. Fill in:
+   - Name: `DSI-Awareness-Pulse`
+   - Type: **script**
+   - Redirect URI: `http://localhost`
+4. Copy the **client ID** (under the app name) and **secret**
+5. Add to `config.json`:
+```json
+"reddit_credentials": {
+    "client_id": "your_client_id_here",
+    "client_secret": "your_secret_here"
+}
+```
+6. Re-run `.\refresh-pulse.ps1` — Reddit data will now flow through PRAW (OAuth)
 
 ---
 
