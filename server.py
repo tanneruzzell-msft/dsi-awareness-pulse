@@ -347,10 +347,20 @@ def api_benchmark():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--port", type=int, default=5100)
+    parser.add_argument("--share", action="store_true", help="Bind to all interfaces so teammates can access")
     args = parser.parse_args()
 
+    host = "0.0.0.0" if args.share else "127.0.0.1"
+
+    import socket
+    hostname = socket.gethostname()
+    local_ip = socket.gethostbyname(hostname)
+
     print(f"\n  DSI Awareness Pulse Dashboard")
-    print(f"  http://localhost:{args.port}")
+    print(f"  Local:   http://localhost:{args.port}")
+    if args.share:
+        print(f"  Network: http://{local_ip}:{args.port}")
+        print(f"  Share this URL with your team ^")
     print(f"  Press Ctrl+C to stop\n")
 
-    app.run(host="127.0.0.1", port=args.port, debug=False)
+    app.run(host=host, port=args.port, debug=False)

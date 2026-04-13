@@ -2,10 +2,14 @@
 # Launches the interactive dashboard server.
 #
 # Usage:
-#   .\start-dashboard.ps1           # Start on http://localhost:5100
-#   .\start-dashboard.ps1 -Port 8080  # Custom port
+#   .\start-dashboard.ps1              # Local only (http://localhost:5100)
+#   .\start-dashboard.ps1 -Share       # Share with team on your network
+#   .\start-dashboard.ps1 -Port 8080   # Custom port
 
-param([int]$Port = 5100)
+param(
+    [int]$Port = 5100,
+    [switch]$Share
+)
 
 $PulseDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Python = "$env:LOCALAPPDATA\Programs\Python\Python312\python.exe"
@@ -20,9 +24,20 @@ if (-not (Test-Path $Python)) {
 
 Write-Host ""
 Write-Host "  DSI Awareness Pulse" -ForegroundColor Cyan
-Write-Host "  Starting dashboard at http://localhost:$Port" -ForegroundColor DarkGray
-Write-Host "  Press Ctrl+C to stop" -ForegroundColor DarkGray
-Write-Host ""
 
-Start-Process "http://localhost:$Port"
-& $Python "$PulseDir\server.py" --port $Port
+if ($Share) {
+    $ip = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object { $_.InterfaceAlias -notmatch "Loopback" -and $_.IPAddress -notmatch "^169" } | Select-Object -First 1).IPAddress
+    Write-Host "  Share this with your team:" -ForegroundColor DarkGray
+    Write-Host "  http://${ip}:${Port}" -ForegroundColor Green
+    Write-Host "  Press Ctrl+C to stop" -ForegroundColor DarkGray
+    Write-Host ""
+    Start-Process "http://localhost:$Port"
+    & $Python "$PulseDir\server.py" --port $Port --share
+} else {
+    Write-Host "  http://localhost:$Port" -ForegroundColor DarkGray
+    Write-Host "  Tip: use -Share to let teammates access" -ForegroundColor DarkGray
+    Write-Host "  Press Ctrl+C to stop" -ForegroundColor DarkGray
+    Write-Host ""
+    Start-Process "http://localhost:$Port"
+    & $Python "$PulseDir\server.py" --port $Port
+}

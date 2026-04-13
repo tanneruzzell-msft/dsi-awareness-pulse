@@ -1,5 +1,18 @@
 {
-    "exclude_title_patterns": [],
+    "exclude_title_patterns": [
+        "investigator",
+        "response",
+        "site",
+        "financial",
+        "indian",
+        "sector",
+        "governments",
+        "travel",
+        "rule",
+        "modevent",
+        "emperor",
+        "wakes"
+    ],
     "exclude_subreddits": [],
     "include_subreddits": [],
     "include_sources": [
