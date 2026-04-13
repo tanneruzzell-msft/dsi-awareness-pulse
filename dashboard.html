@@ -267,7 +267,7 @@
             <h2>All Tracked Articles</h2>
             <table>
                 <thead>
-                    <tr><th>Title</th><th>Source</th><th>Type</th><th>Sentiment</th><th>Published</th><th>Discovered</th></tr>
+                    <tr><th>ID</th><th>Title</th><th>Source</th><th>Type</th><th>Sentiment</th><th>Published</th><th>Status</th></tr>
                 </thead>
                 <tbody id="articles-table"></tbody>
             </table>
@@ -427,19 +427,23 @@
         function renderArticles() {
             const tbody = document.getElementById('articles-table');
             if (!DATA.articles || DATA.articles.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">No articles tracked yet</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted)">No articles tracked yet</td></tr>';
                 return;
             }
-            tbody.innerHTML = DATA.articles.map(a => `
-                <tr>
+            tbody.innerHTML = DATA.articles.map(a => {
+                const flagged = a.flagged ? ' style="opacity:0.4;text-decoration:line-through"' : '';
+                const status = a.flagged ? `<span class="badge negative" title="${a.flag_reason || ''}">flagged</span>` : (a.manually_added ? '<span class="badge positive">manual</span>' : '');
+                return `
+                <tr${flagged}>
+                    <td><code style="font-size:11px;color:var(--text-muted)">${a.id}</code></td>
                     <td><a href="${a.url}" target="_blank">${a.title}</a></td>
                     <td>${a.source}</td>
                     <td><span class="badge ${a.type}">${a.type === 'third_party' ? '3rd Party' : 'Microsoft'}</span></td>
                     <td><span class="badge ${a.sentiment}">${a.sentiment}</span></td>
                     <td>${a.published_date || '—'}</td>
-                    <td>${a.discovered}</td>
-                </tr>
-            `).join('');
+                    <td>${status}</td>
+                </tr>`;
+            }).join('');
         }
 
         function renderReddit() {
@@ -448,16 +452,21 @@
                 el.innerHTML = `<div class="empty-state"><div class="emoji">🔇</div><p>No Reddit mentions found</p><p style="font-size:12px">This is actually useful data — DSI has zero organic Reddit presence.</p></div>`;
                 return;
             }
-            el.innerHTML = '<table><thead><tr><th>Subreddit</th><th>Title</th><th>Score</th><th>Comments</th><th>Date</th></tr></thead><tbody>' +
-                DATA.reddit_mentions.map(r => `
-                    <tr>
+            el.innerHTML = '<table><thead><tr><th>ID</th><th>Subreddit</th><th>Title</th><th>Score</th><th>Comments</th><th>Date</th><th>Status</th></tr></thead><tbody>' +
+                DATA.reddit_mentions.map(r => {
+                    const flagged = r.flagged ? ' style="opacity:0.4;text-decoration:line-through"' : '';
+                    const status = r.flagged ? `<span class="badge negative" title="${r.flag_reason || ''}">flagged</span>` : (r.manually_added ? '<span class="badge positive">manual</span>' : '');
+                    return `
+                    <tr${flagged}>
+                        <td><code style="font-size:11px;color:var(--text-muted)">${r.id}</code></td>
                         <td>r/${r.subreddit}</td>
                         <td><a href="${r.url}" target="_blank">${r.title}</a></td>
                         <td>${r.score}</td>
                         <td>${r.num_comments}</td>
                         <td>${new Date(r.created_utc * 1000).toLocaleDateString()}</td>
-                    </tr>
-                `).join('') + '</tbody></table>';
+                        <td>${status}</td>
+                    </tr>`;
+                }).join('') + '</tbody></table>';
         }
 
         function renderTrends() {

@@ -400,12 +400,12 @@ def generate_snapshot(conn):
     if existing:
         c.execute("DELETE FROM pulse_snapshots WHERE snapshot_date = ?", (today,))
 
-    total_articles = c.execute("SELECT COUNT(*) FROM articles").fetchone()[0]
-    third_party = c.execute("SELECT COUNT(*) FROM articles WHERE type = 'third_party'").fetchone()[0]
-    microsoft = c.execute("SELECT COUNT(*) FROM articles WHERE type = 'microsoft'").fetchone()[0]
+    total_articles = c.execute("SELECT COUNT(*) FROM articles WHERE COALESCE(flagged, 0) = 0").fetchone()[0]
+    third_party = c.execute("SELECT COUNT(*) FROM articles WHERE type = 'third_party' AND COALESCE(flagged, 0) = 0").fetchone()[0]
+    microsoft = c.execute("SELECT COUNT(*) FROM articles WHERE type = 'microsoft' AND COALESCE(flagged, 0) = 0").fetchone()[0]
 
-    reddit_count = c.execute("SELECT COUNT(*) FROM reddit_mentions").fetchone()[0]
-    reddit_score = c.execute("SELECT COALESCE(SUM(score), 0) FROM reddit_mentions").fetchone()[0]
+    reddit_count = c.execute("SELECT COUNT(*) FROM reddit_mentions WHERE COALESCE(flagged, 0) = 0").fetchone()[0]
+    reddit_score = c.execute("SELECT COALESCE(SUM(score), 0) FROM reddit_mentions WHERE COALESCE(flagged, 0) = 0").fetchone()[0]
 
     youtube_count = c.execute("SELECT COUNT(*) FROM youtube_videos").fetchone()[0]
 
@@ -429,9 +429,9 @@ def generate_snapshot(conn):
     awareness_pct = (composite / 10) * 100
 
     # Favorability (from sentiment on articles)
-    pos = c.execute("SELECT COUNT(*) FROM articles WHERE sentiment = 'positive'").fetchone()[0]
-    mixed = c.execute("SELECT COUNT(*) FROM articles WHERE sentiment = 'mixed'").fetchone()[0]
-    neg = c.execute("SELECT COUNT(*) FROM articles WHERE sentiment = 'negative'").fetchone()[0]
+    pos = c.execute("SELECT COUNT(*) FROM articles WHERE sentiment = 'positive' AND COALESCE(flagged, 0) = 0").fetchone()[0]
+    mixed = c.execute("SELECT COUNT(*) FROM articles WHERE sentiment = 'mixed' AND COALESCE(flagged, 0) = 0").fetchone()[0]
+    neg = c.execute("SELECT COUNT(*) FROM articles WHERE sentiment = 'negative' AND COALESCE(flagged, 0) = 0").fetchone()[0]
     total_rated = pos + mixed + neg
     favorability = ((pos * 1.0 + mixed * 0.5) / max(total_rated, 1)) * 100
 

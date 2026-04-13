@@ -1,35 +1,35 @@
 {
-  "generated_at": "2026-04-13T12:22:16.674882",
+  "generated_at": "2026-04-13T12:27:24.690848",
   "latest_snapshot": {
-    "id": 4,
+    "id": 6,
     "snapshot_date": "2026-04-13",
     "total_articles": 12,
     "third_party_articles": 8,
     "microsoft_articles": 4,
-    "reddit_mentions": 12,
-    "reddit_total_score": 69,
+    "reddit_mentions": 5,
+    "reddit_total_score": 5,
     "youtube_videos": 0,
     "google_trends_avg": 9,
     "composite_score": 5.88,
     "awareness_pct": 58.8,
     "favorability_pct": 91.7,
-    "notes": "Auto-generated 2026-04-13T12:22:16.669882"
+    "notes": "Auto-generated 2026-04-13T12:27:24.686848"
   },
   "snapshots": [
     {
-      "id": 4,
+      "id": 6,
       "snapshot_date": "2026-04-13",
       "total_articles": 12,
       "third_party_articles": 8,
       "microsoft_articles": 4,
-      "reddit_mentions": 12,
-      "reddit_total_score": 69,
+      "reddit_mentions": 5,
+      "reddit_total_score": 5,
       "youtube_videos": 0,
       "google_trends_avg": 9,
       "composite_score": 5.88,
       "awareness_pct": 58.8,
       "favorability_pct": 91.7,
-      "notes": "Auto-generated 2026-04-13T12:22:16.669882"
+      "notes": "Auto-generated 2026-04-13T12:27:24.686848"
     }
   ],
   "articles": [
@@ -42,7 +42,10 @@
       "sentiment": "positive",
       "discovered": "2026-04-07",
       "last_checked": "2026-04-13",
-      "published_date": "2026-04-01"
+      "published_date": "2026-04-01",
+      "flagged": 0,
+      "flag_reason": null,
+      "manually_added": 0
     },
     {
       "id": "9910e6c8ee53",
@@ -53,7 +56,10 @@
       "sentiment": "positive",
       "discovered": "2026-04-13",
       "last_checked": "2026-04-13",
-      "published_date": "2026-03-20"
+      "published_date": "2026-03-20",
+      "flagged": 0,
+      "flag_reason": null,
+      "manually_added": 0
     },
     {
       "id": "5c751dc224ef",
@@ -64,7 +70,10 @@
       "sentiment": "positive",
       "discovered": "2026-04-13",
       "last_checked": "2026-04-13",
-      "published_date": "2026-03-15"
+      "published_date": "2026-03-15",
+      "flagged": 0,
+      "flag_reason": null,
+      "manually_added": 0
     },
     {
       "id": "f37775975062",
@@ -75,7 +84,10 @@
       "sentiment": "positive",
       "discovered": "2026-04-07",
       "last_checked": "2026-04-13",
-      "published_date": "2026-01-27"
+      "published_date": "2026-01-27",
+      "flagged": 0,
+      "flag_reason": null,
+      "manually_added": 0
     },
     {
       "id": "faee9c9bd42d",
@@ -86,7 +98,10 @@
       "sentiment": "positive",
       "discovered": "2026-04-07",
       "last_checked": "2026-04-13",
-      "published_date": "2026-01-27"
+      "published_date": "2026-01-27",
+      "flagged": 0,
+      "flag_reason": null,
+      "manually_added": 0
     },
     {
       "id": "41bd5550779e",
@@ -97,7 +112,10 @@
       "sentiment": "positive",
       "discovered": "2026-04-13",
       "last_checked": "2026-04-13",
-      "published_date": "2026-01-27"
+      "published_date": "2026-01-27",
+      "flagged": 0,
+      "flag_reason": null,
+      "manually_added": 0
     },
     {
       "id": "a30e4ec48076",
@@ -108,7 +126,10 @@
       "sentiment": "positive",
       "discovered": "2026-04-13",
       "last_checked": "2026-04-13",
-      "published_date": "2026-01-27"
+      "published_date": "2026-01-27",
+      "flagged": 0,
+      "flag_reason": null,
+      "manually_added": 0
     },
     {
       "id": "b71ef7a79ff8",
@@ -119,7 +140,10 @@
       "sentiment": "positive",
       "discovered": "2026-04-07",
       "last_checked": "2026-04-13",
-      "published_date": "2026-01-15"
+      "published_date": "2026-01-15",
+      "flagged": 0,
+      "flag_reason": null,
+      "manually_added": 0
     },
     {
       "id": "d2c4ba73d0ed",
@@ -130,7 +154,10 @@
       "sentiment": "mixed",
       "discovered": "2026-04-07",
       "last_checked": "2026-04-13",
-      "published_date": "2026-01-06"
+      "published_date": "2026-01-06",
+      "flagged": 0,
+      "flag_reason": null,
+      "manually_added": 0
     },
     {
       "id": "b1642d5845ae",
@@ -141,7 +168,10 @@
       "sentiment": "mixed",
       "discovered": "2026-04-13",
       "last_checked": "2026-04-13",
-      "published_date": "2025-12-01"
+      "published_date": "2025-12-01",
+      "flagged": 0,
+      "flag_reason": null,
+      "manually_added": 0
     },
     {
       "id": "116fb93e615c",
@@ -152,7 +182,10 @@
       "sentiment": "positive",
       "discovered": "2026-04-07",
       "last_checked": "2026-04-13",
-      "published_date": "2025-10-15"
+      "published_date": "2025-10-15",
+      "flagged": 0,
+      "flag_reason": null,
+      "manually_added": 0
     },
     {
       "id": "1cc1522221c2",
@@ -163,7 +196,10 @@
       "sentiment": "positive",
       "discovered": "2026-04-07",
       "last_checked": "2026-04-13",
-      "published_date": "2025-10-15"
+      "published_date": "2025-10-15",
+      "flagged": 0,
+      "flag_reason": null,
+      "manually_added": 0
     }
   ],
   "reddit_mentions": [
@@ -177,7 +213,10 @@
       "num_comments": 0,
       "created_utc": 1746131418.0,
       "discovered": "2026-04-13",
-      "search_term": "data security investigations"
+      "search_term": "data security investigations",
+      "flagged": 0,
+      "flag_reason": null,
+      "manually_added": 0
     },
     {
       "id": "49afb9807979",
@@ -189,7 +228,10 @@
       "num_comments": 0,
       "created_utc": 1745851205.0,
       "discovered": "2026-04-13",
-      "search_term": "data security investigations"
+      "search_term": "data security investigations",
+      "flagged": 0,
+      "flag_reason": null,
+      "manually_added": 0
     },
     {
       "id": "23990cf3d60d",
@@ -201,7 +243,10 @@
       "num_comments": 0,
       "created_utc": 1743510327.0,
       "discovered": "2026-04-13",
-      "search_term": "data security investigations"
+      "search_term": "data security investigations",
+      "flagged": 0,
+      "flag_reason": null,
+      "manually_added": 0
     },
     {
       "id": "47cedbfe101d",
@@ -213,7 +258,10 @@
       "num_comments": 0,
       "created_utc": 1743506755.0,
       "discovered": "2026-04-13",
-      "search_term": "data security investigations"
+      "search_term": "data security investigations",
+      "flagged": 0,
+      "flag_reason": null,
+      "manually_added": 0
     },
     {
       "id": "e4e9e02c9323",
@@ -225,7 +273,10 @@
       "num_comments": 0,
       "created_utc": 1742922509.0,
       "discovered": "2026-04-13",
-      "search_term": "data security investigations"
+      "search_term": "data security investigations",
+      "flagged": 0,
+      "flag_reason": null,
+      "manually_added": 0
     },
     {
       "id": "2fc6c765ea09",
@@ -237,7 +288,10 @@
       "num_comments": 0,
       "created_utc": 1725593022.0,
       "discovered": "2026-04-13",
-      "search_term": "data security investigations"
+      "search_term": "data security investigations",
+      "flagged": 1,
+      "flag_reason": "Generic career guide - not about DSI",
+      "manually_added": 0
     },
     {
       "id": "656562fac4ce",
@@ -249,7 +303,10 @@
       "num_comments": 0,
       "created_utc": 1673730016.0,
       "discovered": "2026-04-13",
-      "search_term": "data security investigations"
+      "search_term": "data security investigations",
+      "flagged": 1,
+      "flag_reason": "Generic course list - not about DSI",
+      "manually_added": 0
     },
     {
       "id": "7be18a0b85d8",
@@ -261,7 +318,10 @@
       "num_comments": 22,
       "created_utc": 1599779621.0,
       "discovered": "2026-04-13",
-      "search_term": "data security investigations"
+      "search_term": "data security investigations",
+      "flagged": 1,
+      "flag_reason": "Oculus/VR - not about DSI",
+      "manually_added": 0
     },
     {
       "id": "4d3a8c94f90e",
@@ -273,7 +333,10 @@
       "num_comments": 23,
       "created_utc": 1599775284.0,
       "discovered": "2026-04-13",
-      "search_term": "data security investigations"
+      "search_term": "data security investigations",
+      "flagged": 1,
+      "flag_reason": "Oculus/VR - not about DSI",
+      "manually_added": 0
     },
     {
       "id": "c7b2e6aae879",
@@ -285,7 +348,10 @@
       "num_comments": 0,
       "created_utc": 1571129548.0,
       "discovered": "2026-04-13",
-      "search_term": "data security investigations"
+      "search_term": "data security investigations",
+      "flagged": 1,
+      "flag_reason": "Generic security list - not about DSI",
+      "manually_added": 0
     },
     {
       "id": "4dbbcd23ec51",
@@ -297,7 +363,10 @@
       "num_comments": 1,
       "created_utc": 1495219413.0,
       "discovered": "2026-04-13",
-      "search_term": "data security investigations"
+      "search_term": "data security investigations",
+      "flagged": 1,
+      "flag_reason": "GIAC GLEG cert - not about Purview DSI",
+      "manually_added": 0
     },
     {
       "id": "38f6b7de6524",
@@ -309,7 +378,10 @@
       "num_comments": 0,
       "created_utc": 1494256874.0,
       "discovered": "2026-04-13",
-      "search_term": "data security investigations"
+      "search_term": "data security investigations",
+      "flagged": 1,
+      "flag_reason": "GIAC GLEG cert - not about Purview DSI",
+      "manually_added": 0
     }
   ],
   "google_trends": [
