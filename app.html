@@ -154,22 +154,22 @@
     <!-- Scorecards -->
     <div class="scores">
         <div class="score-card awareness">
-            <div class="label">Awareness Score</div>
+            <div class="label">Brand Awareness Index</div>
             <div class="value yellow" id="sc-awareness">—</div>
-            <div class="sub">composite (target: 60%+)</div>
+            <div class="sub">composite across all signals</div>
         </div>
         <div class="score-card favorability">
-            <div class="label">Favorability</div>
+            <div class="label">Net Sentiment</div>
             <div class="value green" id="sc-favorability">—</div>
-            <div class="sub">positive + mixed sentiment</div>
+            <div class="sub">positive + mixed coverage</div>
         </div>
         <div class="score-card articles">
-            <div class="label">Articles Tracked</div>
+            <div class="label">Earned Media</div>
             <div class="value accent" id="sc-articles">0</div>
             <div class="sub" id="sc-articles-sub">0 third-party, 0 Microsoft</div>
         </div>
         <div class="score-card reddit">
-            <div class="label">Reddit Mentions</div>
+            <div class="label">Community Mentions</div>
             <div class="value orange" id="sc-reddit">0</div>
             <div class="sub" id="sc-reddit-sub">across 0 subreddits</div>
         </div>
@@ -182,25 +182,25 @@
 
     <!-- Tabs -->
     <div class="tabs">
-        <button class="tab-btn active" data-tab="trends">📈 Trends</button>
-        <button class="tab-btn" data-tab="articles">📰 Articles</button>
-        <button class="tab-btn" data-tab="reddit">💬 Reddit</button>
+        <button class="tab-btn active" data-tab="trends">📈 Search Interest</button>
+        <button class="tab-btn" data-tab="articles">📰 Earned Media</button>
+        <button class="tab-btn" data-tab="reddit">💬 Community</button>
         <button class="tab-btn" data-tab="linkedin">💼 LinkedIn</button>
         <button class="tab-btn" data-tab="add">➕ Add Entry</button>
-        <button class="tab-btn" data-tab="benchmark">🏆 Benchmark</button>
+        <button class="tab-btn" data-tab="benchmark">🏆 Share of Voice</button>
         <button class="tab-btn" data-tab="history">📊 History</button>
         <button class="tab-btn" data-tab="methodology">✅ Methodology</button>
     </div>
 
     <!-- Trends -->
     <div class="tab-panel active" id="panel-trends">
-        <div class="card"><h2>Google Trends — Interest Over Time</h2><div class="chart-wrap"><canvas id="trends-chart"></canvas></div></div>
+        <div class="card"><h2>Branded Search Interest — Google Trends</h2><div class="chart-wrap"><canvas id="trends-chart"></canvas></div></div>
     </div>
 
     <!-- Articles -->
     <div class="tab-panel" id="panel-articles">
         <div class="card">
-            <h2>All Tracked Articles</h2>
+            <h2>Earned Media — Articles & Coverage</h2>
             <div class="filter-bar">
                 <select id="filter-article-type" onchange="renderArticles()">
                     <option value="all">All types</option>
@@ -221,7 +221,7 @@
     <!-- Reddit -->
     <div class="tab-panel" id="panel-reddit">
         <div class="card">
-            <h2>Reddit Mentions</h2>
+            <h2>Community Mentions — Reddit</h2>
             <div class="filter-bar">
                 <select id="filter-reddit-flag" onchange="renderReddit()">
                     <option value="unflagged">Unflagged only</option>
@@ -263,30 +263,30 @@
     <!-- Benchmark -->
     <div class="tab-panel" id="panel-benchmark">
         <div class="card">
-            <h2>Competitive Awareness Benchmark</h2>
-            <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px">Compares Reddit mentions + Google Trends interest across competitors. These are the two signals measurable for everyone. DSI's full score (including articles, MS content) is shown separately on the main dashboard.</p>
+            <h2>Share of Voice — Competitive Comparison</h2>
+            <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px">Share of Voice (SOV) measures your brand's visibility relative to competitors. SOV correlates with market share over time (HBR). Measured via community mentions + branded search interest — the two signals available for all competitors at zero cost.</p>
             <div class="chart-wrap" style="height:350px"><canvas id="benchmark-chart"></canvas></div>
         </div>
         <div class="card">
-            <h2>Detailed Comparison</h2>
+            <h2>Share of Voice Breakdown</h2>
             <table>
-                <thead><tr><th>Product</th><th>Reddit Posts</th><th>Reddit Score</th><th>Trends Avg</th><th>Benchmark Score</th><th>Gap vs DSI</th></tr></thead>
+                <thead><tr><th>Product</th><th>Community Mentions</th><th>Engagement Score</th><th>Search Interest</th><th>SOV Score</th><th>Gap vs DSI</th></tr></thead>
                 <tbody id="benchmark-tbody"></tbody>
             </table>
             <p style="color:var(--text-muted);font-size:11px;margin-top:12px">Benchmark data collected via PullPush (Reddit archive) + Google Trends. Run <code>python benchmark.py</code> to refresh.</p>
         </div>
         <div class="card">
-            <h2>Where DSI Can Close the Gap</h2>
+            <h2>Gap Analysis & Opportunities</h2>
             <div id="benchmark-insights"></div>
         </div>
     </div>
 
     <!-- History -->
     <div class="tab-panel" id="panel-history">
-        <div class="card"><h2>Awareness Score Over Time</h2><div class="chart-wrap"><canvas id="history-chart"></canvas></div></div>
+        <div class="card"><h2>Brand Awareness Index — Over Time</h2><div class="chart-wrap"><canvas id="history-chart"></canvas></div></div>
         <div class="card">
             <h2>Snapshot History</h2>
-            <table><thead><tr><th>Date</th><th>Awareness</th><th>Favorability</th><th>Articles</th><th>Reddit</th><th>Trends Avg</th><th>Composite</th></tr></thead>
+            <table><thead><tr><th>Date</th><th>Awareness</th><th>Sentiment</th><th>Earned Media</th><th>Community</th><th>Search Interest</th><th>Composite</th></tr></thead>
             <tbody id="history-tbody"></tbody></table>
         </div>
     </div>
@@ -294,24 +294,25 @@
     <!-- Methodology -->
     <div class="tab-panel" id="panel-methodology">
         <div class="card">
-            <h2>Data Sources & Verification</h2>
-            <p style="color:var(--text-muted);margin-bottom:16px">Every data point is from a public, verifiable source. Click any link to confirm.</p>
-            <table><thead><tr><th>Signal</th><th>Source</th><th>Method</th><th>Verify</th></tr></thead><tbody>
-                <tr><td>Articles</td><td>DuckDuckGo + manual seed</td><td>Web search for DSI keywords</td><td><a href="https://duckduckgo.com/?q=%22Microsoft+Purview+Data+Security+Investigations%22" target="_blank">Search →</a></td></tr>
-                <tr><td>Reddit</td><td>PullPush archive API</td><td>Full Reddit archive search (no auth needed)</td><td><a href="https://www.reddit.com/search/?q=%22data+security+investigations%22+purview" target="_blank">Search →</a></td></tr>
-                <tr><td>Google Trends</td><td>Google Trends via pytrends</td><td>Interest-over-time for tracked keywords</td><td><a href="https://trends.google.com/trends/explore?q=%22data+security+investigations%22" target="_blank">Check →</a></td></tr>
-                <tr><td>Sentiment</td><td>Manual classification</td><td>Each article read and tagged</td><td>Click any article link</td></tr>
+            <h2>Data Sources & Methodology</h2>
+            <p style="color:var(--text-muted);margin-bottom:16px">Every data point is from a public, verifiable source. This dashboard uses the same signals as industry-standard social listening tools (Brandwatch, Sprout Social) and SEO platforms (Ahrefs, Semrush) — at zero cost.</p>
+            <table><thead><tr><th>Signal</th><th>Industry Equivalent</th><th>Source</th><th>Verify</th></tr></thead><tbody>
+                <tr><td>Earned Media</td><td>Media monitoring (Brandwatch, Meltwater)</td><td>DuckDuckGo search + manual seed</td><td><a href="https://duckduckgo.com/?q=%22Microsoft+Purview+Data+Security+Investigations%22" target="_blank">Search →</a></td></tr>
+                <tr><td>Community Mentions</td><td>Social listening (Brandwatch, Sprout Social)</td><td>PullPush Reddit archive API</td><td><a href="https://www.reddit.com/search/?q=%22data+security+investigations%22+purview" target="_blank">Search →</a></td></tr>
+                <tr><td>Search Interest</td><td>SEO visibility (Ahrefs, Semrush)</td><td>Google Trends via pytrends</td><td><a href="https://trends.google.com/trends/explore?q=%22data+security+investigations%22" target="_blank">Check →</a></td></tr>
+                <tr><td>Net Sentiment</td><td>Sentiment analysis (Brandwatch)</td><td>Manual article classification</td><td>Click any article link</td></tr>
             </tbody></table>
 
-            <h2 style="margin-top:24px">Scoring Methodology</h2>
+            <h2 style="margin-top:24px">Brand Awareness Index — Scoring</h2>
             <table><thead><tr><th>Component</th><th>Weight</th><th>Scoring</th></tr></thead><tbody>
-                <tr><td>Third-party articles</td><td>25%</td><td>2.5 pts per article, max 10</td></tr>
-                <tr><td>Reddit mentions</td><td>20%</td><td>2 pts per mention, max 10</td></tr>
-                <tr><td>Google Trends (30d avg)</td><td>20%</td><td>Interest / 10, max 10</td></tr>
-                <tr><td>Microsoft content</td><td>20%</td><td>1.5 pts per post, max 10</td></tr>
-                <tr><td>YouTube videos</td><td>15%</td><td>3 pts per video, max 10</td></tr>
+                <tr><td>Earned media (third-party articles)</td><td>25%</td><td>2.5 pts per article, max 10</td></tr>
+                <tr><td>Community mentions (Reddit)</td><td>20%</td><td>2 pts per mention, max 10</td></tr>
+                <tr><td>Branded search interest (Google Trends 30d avg)</td><td>20%</td><td>Interest / 10, max 10</td></tr>
+                <tr><td>Owned media (Microsoft content)</td><td>20%</td><td>1.5 pts per post, max 10</td></tr>
+                <tr><td>Video presence (YouTube)</td><td>15%</td><td>3 pts per video, max 10</td></tr>
             </tbody></table>
-            <p style="color:var(--text-muted);font-size:12px;margin-top:8px">Favorability = (positive + mixed×0.5) / total_rated × 100. Flagged entries excluded from all scores.</p>
+            <p style="color:var(--text-muted);font-size:12px;margin-top:8px">Net Sentiment = (positive + mixed×0.5) / total_rated × 100. Flagged entries excluded from all scores.</p>
+            <p style="color:var(--text-muted);font-size:12px;margin-top:4px">Share of Voice (benchmark tab) uses Community Mentions + Search Interest only (50/50) for fair cross-product comparison.</p>
         </div>
     </div>
 </div>
@@ -463,8 +464,8 @@ function renderHistory() {
         new Chart(document.getElementById('history-chart'), {
             type: 'line',
             data: { labels: snapshots.map(s => s.snapshot_date), datasets: [
-                { label: 'Awareness %', data: snapshots.map(s => s.awareness_pct), borderColor: '#fbbf24', backgroundColor: '#fbbf2415', fill: true, tension: 0.3, borderWidth: 2 },
-                { label: 'Favorability %', data: snapshots.map(s => s.favorability_pct), borderColor: '#34d399', backgroundColor: '#34d39915', fill: true, tension: 0.3, borderWidth: 2 }
+                { label: 'Brand Awareness Index', data: snapshots.map(s => s.awareness_pct), borderColor: '#fbbf24', backgroundColor: '#fbbf2415', fill: true, tension: 0.3, borderWidth: 2 },
+                { label: 'Net Sentiment', data: snapshots.map(s => s.favorability_pct), borderColor: '#34d399', backgroundColor: '#34d39915', fill: true, tension: 0.3, borderWidth: 2 }
             ]},
             options: { responsive: true, maintainAspectRatio: false, scales: {
                 x: { grid: { color: '#2d3140' }, ticks: { color: '#8891a4', font: { size: 11 } } },
@@ -509,14 +510,14 @@ function renderBenchmark() {
             labels: sorted,
             datasets: [
                 {
-                    label: 'Reddit Posts',
+                    label: 'Community Mentions',
                     data: sorted.map(n => comps[n].reddit_posts || 0),
                     backgroundColor: sorted.map(n => n === 'DSI (Purview)' ? '#fb923c' : '#4a3520'),
                     borderColor: sorted.map(n => n === 'DSI (Purview)' ? '#fb923c' : '#6b5030'),
                     borderWidth: 1
                 },
                 {
-                    label: 'Google Trends Avg',
+                    label: 'Search Interest (Google Trends)',
                     data: sorted.map(n => comps[n].trends_avg || 0),
                     backgroundColor: sorted.map(n => n === 'DSI (Purview)' ? '#5b9aff' : '#1f2a3f'),
                     borderColor: sorted.map(n => n === 'DSI (Purview)' ? '#5b9aff' : '#3a4a6f'),
@@ -540,7 +541,7 @@ function renderBenchmark() {
     tbody.innerHTML = sorted.map(name => {
         const c = comps[name];
         const isDSI = name === 'DSI (Purview)';
-        const gap = isDSI ? '—' : `${c.reddit_posts - (dsiData.reddit_posts || 0)} posts, ${(c.trends_avg || 0) - (dsiData.trends_avg || 0)} trends pts`;
+        const gap = isDSI ? '—' : `${c.reddit_posts - (dsiData.reddit_posts || 0)} mentions, ${(c.trends_avg || 0) - (dsiData.trends_avg || 0)} search pts`;
         const style = isDSI ? ' style="background:var(--surface2);font-weight:600"' : '';
         const fullScore = isDSI && c.full_awareness_pct ? ` <span style="color:var(--green);font-size:11px">(full: ${c.full_awareness_pct}%)</span>` : '';
         return `<tr${style}>
