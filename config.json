@@ -1,0 +1,88 @@
+{
+    "search_terms": [
+        "Microsoft Purview Data Security Investigations",
+        "Purview DSI",
+        "data security investigations purview"
+    ],
+    "reddit_subreddits": [
+        "sysadmin",
+        "cybersecurity",
+        "MicrosoftSecurity",
+        "AZURE",
+        "microsoft365",
+        "AskNetsec",
+        "netsec"
+    ],
+    "known_articles": [
+        {
+            "url": "https://www.helpnetsecurity.com/2026/01/27/microsoft-purview-data-security-investigations/",
+            "title": "Microsoft brings AI-powered investigations to security teams",
+            "source": "HelpNetSecurity",
+            "type": "third_party",
+            "sentiment": "positive",
+            "discovered": "2026-04-07"
+        },
+        {
+            "url": "https://petri.com/microsoft-purview-ai-data-breach-investigations/",
+            "title": "Microsoft Purview Gets AI Tool for Faster Data Breach Investigations",
+            "source": "Petri",
+            "type": "third_party",
+            "sentiment": "positive",
+            "discovered": "2026-04-07"
+        },
+        {
+            "url": "https://4sysops.com/archives/microsoft-purview-data-security-investigations-ai-powered-threat-detection-for-microsoft-365/",
+            "title": "AI-powered threat detection for Microsoft 365",
+            "source": "4sysops",
+            "type": "third_party",
+            "sentiment": "positive",
+            "discovered": "2026-04-07"
+        },
+        {
+            "url": "https://office365itpros.com/2026/01/06/data-security-investigation/",
+            "title": "A Quick Look at Purview Data Security Investigations",
+            "source": "Office365ItPros",
+            "type": "third_party",
+            "sentiment": "mixed",
+            "discovered": "2026-04-07"
+        },
+        {
+            "url": "https://techcommunity.microsoft.com/blog/microsoft-security-blog/accelerate-data-security-investigations-with-ai-powered-deep-content-analysis/4396099",
+            "title": "Accelerate data security investigations with AI",
+            "source": "Microsoft Tech Community",
+            "type": "microsoft",
+            "sentiment": "positive",
+            "discovered": "2026-04-07"
+        },
+        {
+            "url": "https://techcommunity.microsoft.com/blog/microsoftmechanicsblog/introducing-microsoft-purview-data-security-investigations/4396678",
+            "title": "Introducing DSI (Microsoft Mechanics)",
+            "source": "Microsoft Tech Community",
+            "type": "microsoft",
+            "sentiment": "positive",
+            "discovered": "2026-04-07"
+        },
+        {
+            "url": "https://techcommunity.microsoft.com/blog/microsoft-security-blog/secure-data-as-ai-scales-new-microsoft-purview-innovations-at-rsa-2026/4503665",
+            "title": "RSA 2026 Purview innovations",
+            "source": "Microsoft Tech Community",
+            "type": "microsoft",
+            "sentiment": "positive",
+            "discovered": "2026-04-07"
+        }
+    ],
+    "competitors": [
+        "Relativity eDiscovery",
+        "Nuix",
+        "Exterro",
+        "Everlaw",
+        "DTEX",
+        "Varonis",
+        "Cyberhaven"
+    ],
+    "google_trends_keywords": [
+        "data security investigations",
+        "Microsoft Purview DSI",
+        "insider threat investigation tool"
+    ]
+}

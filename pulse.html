@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSI Awareness Pulse</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --border: #30363d;
+            --text: #e6edf3;
+            --text-muted: #8b949e;
+            --accent: #58a6ff;
+            --green: #3fb950;
+            --yellow: #d29922;
+            --red: #f85149;
+            --purple: #bc8cff;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 24px;
+            line-height: 1.5;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 16px;
+        }
+
+        .header h1 { font-size: 24px; font-weight: 600; }
+        .header .meta { color: var(--text-muted); font-size: 13px; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .card.wide { grid-column: span 2; }
+        .card.full { grid-column: 1 / -1; }
+
+        .card h2 {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .big-number {
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .big-number.green { color: var(--green); }
+        .big-number.yellow { color: var(--yellow); }
+        .big-number.red { color: var(--red); }
+        .big-number.accent { color: var(--accent); }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .score-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+
+        .score-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 250px;
+            margin-top: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 12px;
+        }
+
+        th {
+            text-align: left;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        td {
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        td a:hover { text-decoration: underline; }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge.positive { background: #1a3a2a; color: var(--green); }
+        .badge.mixed { background: #3a2a1a; color: var(--yellow); }
+        .badge.negative { background: #3a1a1a; color: var(--red); }
+        .badge.unknown { background: #1a1a2a; color: var(--text-muted); }
+        .badge.third_party { background: #1a2a3a; color: var(--accent); }
+        .badge.microsoft { background: #2a1a3a; color: var(--purple); }
+
+        .tab-bar {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0;
+        }
+
+        .tab {
+            padding: 8px 16px;
+            cursor: pointer;
+            color: var(--text-muted);
+            border-bottom: 2px solid transparent;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .tab:hover { color: var(--text); }
+        .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+
+        .empty-state .emoji { font-size: 32px; margin-bottom: 8px; }
+
+        .log-entry {
+            font-family: 'Cascadia Code', 'Fira Code', monospace;
+            font-size: 12px;
+            padding: 4px 0;
+            color: var(--text-muted);
+        }
+
+        .log-entry .success { color: var(--green); }
+        .log-entry .error { color: var(--red); }
+
+        .refresh-btn {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .refresh-btn:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📡 DSI Awareness Pulse</h1>
+        <div class="meta">
+            Last updated: <span id="last-updated">—</span>
+            &nbsp;·&nbsp;
+            <span id="snapshot-count">0</span> snapshots tracked
+        </div>
+    </div>
+
+    <!-- Scorecards -->
+    <div class="grid" id="scorecards">
+        <div class="card">
+            <h2>Awareness Score</h2>
+            <div class="big-number yellow" id="awareness-score">—</div>
+            <div class="subtitle">composite % (target: 60%+)</div>
+            <div class="score-bar"><div class="score-bar-fill" id="awareness-bar" style="width:0%; background: var(--yellow)"></div></div>
+        </div>
+        <div class="card">
+            <h2>Favorability</h2>
+            <div class="big-number green" id="favorability-score">—</div>
+            <div class="subtitle">positive + mixed sentiment</div>
+            <div class="score-bar"><div class="score-bar-fill" id="favorability-bar" style="width:0%; background: var(--green)"></div></div>
+        </div>
+        <div class="card">
+            <h2>Third-Party Articles</h2>
+            <div class="big-number accent" id="tp-articles">0</div>
+            <div class="subtitle">independent coverage</div>
+        </div>
+        <div class="card">
+            <h2>Reddit Mentions</h2>
+            <div class="big-number" id="reddit-count" style="color: #ff4500">0</div>
+            <div class="subtitle" id="reddit-subs">across 0 subreddits</div>
+        </div>
+        <div class="card">
+            <h2>Total Articles</h2>
+            <div class="big-number accent" id="total-articles">0</div>
+            <div class="subtitle" id="ms-articles">0 Microsoft, 0 third-party</div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-bar">
+        <div class="tab active" data-tab="trends">📈 Trends</div>
+        <div class="tab" data-tab="articles">📰 Articles</div>
+        <div class="tab" data-tab="reddit">💬 Reddit</div>
+        <div class="tab" data-tab="history">📊 History</div>
+        <div class="tab" data-tab="log">🔧 Collection Log</div>
+        <div class="tab" data-tab="verify">✅ Verify Data</div>
+    </div>
+
+    <!-- Trends Tab -->
+    <div class="tab-content active" id="tab-trends">
+        <div class="card full">
+            <h2>Google Trends — Interest Over Time</h2>
+            <div class="chart-container">
+                <canvas id="trends-chart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Articles Tab -->
+    <div class="tab-content" id="tab-articles">
+        <div class="card full">
+            <h2>All Tracked Articles</h2>
+            <table>
+                <thead>
+                    <tr><th>Title</th><th>Source</th><th>Type</th><th>Sentiment</th><th>Discovered</th></tr>
+                </thead>
+                <tbody id="articles-table"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Reddit Tab -->
+    <div class="tab-content" id="tab-reddit">
+        <div class="card full">
+            <h2>Reddit Mentions</h2>
+            <div id="reddit-content"></div>
+        </div>
+    </div>
+
+    <!-- History Tab -->
+    <div class="tab-content" id="tab-history">
+        <div class="card full">
+            <h2>Awareness Score Over Time</h2>
+            <div class="chart-container">
+                <canvas id="history-chart"></canvas>
+            </div>
+        </div>
+        <div class="card full" style="margin-top: 16px;">
+            <h2>Snapshot History</h2>
+            <table>
+                <thead>
+                    <tr><th>Date</th><th>Awareness</th><th>Favorability</th><th>Articles</th><th>Reddit</th><th>Trends Avg</th><th>Composite</th></tr>
+                </thead>
+                <tbody id="history-table"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Log Tab -->
+    <div class="tab-content" id="tab-log">
+        <div class="card full">
+            <h2>Recent Collection Runs</h2>
+            <div id="log-content"></div>
+        </div>
+    </div>
+
+    <!-- Verify Data Tab -->
+    <div class="tab-content" id="tab-verify">
+        <div class="card full">
+            <h2>Data Provenance</h2>
+            <p style="color: var(--text-muted); margin-bottom: 16px;">Every data point in this dashboard comes from a public, verifiable source. Click any link below to confirm the data is real.</p>
+
+            <h2 style="margin-top: 24px;">How Each Signal Is Collected</h2>
+            <table>
+                <thead>
+                    <tr><th>Signal</th><th>Source</th><th>Method</th><th>Verify It Yourself</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Articles</td>
+                        <td>DuckDuckGo + manual seed</td>
+                        <td>Web search for DSI keywords; known articles from config.json</td>
+                        <td><a href="https://duckduckgo.com/?q=%22Microsoft+Purview+Data+Security+Investigations%22" target="_blank">Search DuckDuckGo</a></td>
+                    </tr>
+                    <tr>
+                        <td>Reddit Mentions</td>
+                        <td>Reddit public JSON API</td>
+                        <td>Search 7 security subreddits for DSI keywords</td>
+                        <td><a href="https://www.reddit.com/search/?q=%22data+security+investigations%22+purview" target="_blank">Search Reddit</a></td>
+                    </tr>
+                    <tr>
+                        <td>Google Trends</td>
+                        <td>Google Trends (via pytrends)</td>
+                        <td>Interest-over-time data for tracked keywords</td>
+                        <td><a href="https://trends.google.com/trends/explore?q=%22data+security+investigations%22" target="_blank">Check Google Trends</a></td>
+                    </tr>
+                    <tr>
+                        <td>Sentiment</td>
+                        <td>Manual classification</td>
+                        <td>Each article read and classified as positive/mixed/negative</td>
+                        <td>Click any article link in the Articles tab to read it</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 style="margin-top: 24px;">Scoring Methodology</h2>
+            <table>
+                <thead>
+                    <tr><th>Component</th><th>Weight</th><th>How It's Scored</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Third-party articles</td><td>25%</td><td>2.5 points per article, max 10</td></tr>
+                    <tr><td>Reddit mentions</td><td>20%</td><td>2 points per mention, max 10</td></tr>
+                    <tr><td>Google Trends (30d avg)</td><td>20%</td><td>Average interest index / 10, max 10</td></tr>
+                    <tr><td>Microsoft content</td><td>20%</td><td>1.5 points per post, max 10</td></tr>
+                    <tr><td>YouTube videos</td><td>15%</td><td>3 points per video, max 10</td></tr>
+                </tbody>
+            </table>
+            <p style="color: var(--text-muted); margin-top: 12px; font-size: 13px;">
+                Favorability = (positive_articles + mixed_articles * 0.5) / total_rated_articles * 100
+            </p>
+
+            <h2 style="margin-top: 24px;">What Zero Reddit Mentions Means</h2>
+            <p style="color: var(--text-muted); font-size: 13px;">
+                Zero Reddit mentions is real, verified data — not a collection failure. DSI has no organic presence on Reddit.
+                This is actually one of the most actionable findings: security practitioners discuss tools on Reddit daily,
+                and DSI isn't part of that conversation. <a href="https://www.reddit.com/search/?q=%22data+security+investigations%22+purview" target="_blank" style="color: var(--accent);">Verify it yourself.</a>
+            </p>
+
+            <h2 style="margin-top: 24px;">Collection Log Summary</h2>
+            <div id="verify-log"></div>
+        </div>
+    </div>
+
+    <script>
+        let DATA = {};
+
+        async function loadData() {
+            DATA = {
+  "generated_at": "2026-04-13T11:51:38.230634",
+  "latest_snapshot": {
+    "id": 3,
+    "snapshot_date": "2026-04-13",
+    "total_articles": 12,
+    "third_party_articles": 8,
+    "microsoft_articles": 4,
+    "reddit_mentions": 0,
+    "reddit_total_score": 0,
+    "youtube_videos": 0,
+    "google_trends_avg": 9,
+    "composite_score": 3.88,
+    "awareness_pct": 38.8,
+    "favorability_pct": 91.7,
+    "notes": "Auto-generated 2026-04-13T11:32:39.899426"
+  },
+  "snapshots": [
+    {
+      "id": 3,
+      "snapshot_date": "2026-04-13",
+      "total_articles": 12,
+      "third_party_articles": 8,
+      "microsoft_articles": 4,
+      "reddit_mentions": 0,
+      "reddit_total_score": 0,
+      "youtube_videos": 0,
+      "google_trends_avg": 9,
+      "composite_score": 3.88,
+      "awareness_pct": 38.8,
+      "favorability_pct": 91.7,
+      "notes": "Auto-generated 2026-04-13T11:32:39.899426"
+    }
+  ],
+  "articles": [
+    {
+      "id": "41bd5550779e",
+      "url": "https://techcommunity.microsoft.com/blog/microsoft-security-blog/microsoft-purview-data-security-investigations-is-now-generally-available/4489363",
+      "title": "Microsoft Purview Data Security Investigations is now generally available",
+      "source": "Microsoft Tech Community",
+      "type": "microsoft",
+      "sentiment": "positive",
+      "discovered": "2026-04-13",
+      "last_checked": "2026-04-13"
+    },
+    {
+      "id": "5c751dc224ef",
+      "url": "https://mc.merill.net/message/MC1266016",
+      "title": "MC1266016: Personal Data Examination",
+      "source": "Merill (MC aggregator)",
+      "type": "third_party",
+      "sentiment": "positive",
+      "discovered": "2026-04-13",
+      "last_checked": "2026-04-13"
+    },
+    {
+      "id": "a30e4ec48076",
+      "url": "https://azurefeeds.com/2026/01/27/microsoft-purview-data-security-investigations-is-now-generally-available/",
+      "title": "DSI is now GA",
+      "source": "AzureFeeds",
+      "type": "third_party",
+      "sentiment": "positive",
+      "discovered": "2026-04-13",
+      "last_checked": "2026-04-13"
+    },
+    {
+      "id": "9910e6c8ee53",
+      "url": "https://m365admin.handsontek.net/microsoft-purview-data-security-investigations-introducing-new-personal-data-examination-2/",
+      "title": "Personal data examination",
+      "source": "HandsOnTek",
+      "type": "third_party",
+      "sentiment": "positive",
+      "discovered": "2026-04-13",
+      "last_checked": "2026-04-13"
+    },
+    {
+      "id": "b1642d5845ae",
+      "url": "https://www.peerspot.com/products/microsoft-purview-ediscovery-reviews",
+      "title": "Microsoft Purview eDiscovery Reviews (covers DSI)",
+      "source": "PeerSpot",
+      "type": "third_party",
+      "sentiment": "mixed",
+      "discovered": "2026-04-13",
+      "last_checked": "2026-04-13"
+    },
+    {
+      "id": "f37775975062",
+      "url": "https://www.helpnetsecurity.com/2026/01/27/microsoft-purview-data-security-investigations/",
+      "title": "Microsoft brings AI-powered investigations to security teams",
+      "source": "HelpNetSecurity",
+      "type": "third_party",
+      "sentiment": "positive",
+      "discovered": "2026-04-07",
+      "last_checked": "2026-04-13"
+    },
+    {
+      "id": "faee9c9bd42d",
+      "url": "https://petri.com/microsoft-purview-ai-data-breach-investigations/",
+      "title": "Microsoft Purview Gets AI Tool for Faster Data Breach Investigations",
+      "source": "Petri",
+      "type": "third_party",
+      "sentiment": "positive",
+      "discovered": "2026-04-07",
+      "last_checked": "2026-04-13"
+    },
+    {
+      "id": "b71ef7a79ff8",
+      "url": "https://4sysops.com/archives/microsoft-purview-data-security-investigations-ai-powered-threat-detection-for-microsoft-365/",
+      "title": "AI-powered threat detection for Microsoft 365",
+      "source": "4sysops",
+      "type": "third_party",
+      "sentiment": "positive",
+      "discovered": "2026-04-07",
+      "last_checked": "2026-04-13"
+    },
+    {
+      "id": "d2c4ba73d0ed",
+      "url": "https://office365itpros.com/2026/01/06/data-security-investigation/",
+      "title": "A Quick Look at Purview Data Security Investigations",
+      "source": "Office365ItPros",
+      "type": "third_party",
+      "sentiment": "mixed",
+      "discovered": "2026-04-07",
+      "last_checked": "2026-04-13"
+    },
+    {
+      "id": "116fb93e615c",
+      "url": "https://techcommunity.microsoft.com/blog/microsoft-security-blog/accelerate-data-security-investigations-with-ai-powered-deep-content-analysis/4396099",
+      "title": "Accelerate data security investigations with AI",
+      "source": "Microsoft Tech Community",
+      "type": "microsoft",
+      "sentiment": "positive",
+      "discovered": "2026-04-07",
+      "last_checked": "2026-04-13"
+    },
+    {
+      "id": "1cc1522221c2",
+      "url": "https://techcommunity.microsoft.com/blog/microsoftmechanicsblog/introducing-microsoft-purview-data-security-investigations/4396678",
+      "title": "Introducing DSI (Microsoft Mechanics)",
+      "source": "Microsoft Tech Community",
+      "type": "microsoft",
+      "sentiment": "positive",
+      "discovered": "2026-04-07",
+      "last_checked": "2026-04-13"
+    },
+    {
+      "id": "3daf27211dff",
+      "url": "https://techcommunity.microsoft.com/blog/microsoft-security-blog/secure-data-as-ai-scales-new-microsoft-purview-innovations-at-rsa-2026/4503665",
+      "title": "RSA 2026 Purview innovations",
+      "source": "Microsoft Tech Community",
+      "type": "microsoft",
+      "sentiment": "positive",
+      "discovered": "2026-04-07",
+      "last_checked": "2026-04-13"
+    }
+  ],
+  "reddit_mentions": [],
+  "google_trends": [
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-13",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-14",
+      "interest": 74
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-15",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-16",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-17",
+      "interest": 48
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-18",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-19",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-20",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-21",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-22",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-23",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-24",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-25",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-26",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-27",
+      "interest": 75
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-28",
+      "interest": 50
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-29",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-30",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-31",
+      "interest": 52
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-01",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-02",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-03",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-04",
+      "interest": 64
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-05",
+      "interest": 56
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-06",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-07",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-08",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-09",
+      "interest": 47
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-10",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-11",
+      "interest": 44
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-12",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-13",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-14",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-15",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-16",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-17",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-18",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-19",
+      "interest": 45
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-20",
+      "interest": 53
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-21",
+      "interest": 49
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-22",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-23",
+      "interest": 60
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-24",
+      "interest": 48
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-25",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-26",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-27",
+      "interest": 100
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-28",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-01",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-02",
+      "interest": 43
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-03",
+      "interest": 52
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-04",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-05",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-06",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-07",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-08",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-09",
+      "interest": 49
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-10",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-11",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-12",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-13",
+      "interest": 46
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-14",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-15",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-16",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-17",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-18",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-19",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-20",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-21",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-22",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-23",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-24",
+      "interest": 51
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-25",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-26",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-27",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-28",
+      "interest": 47
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-29",
+      "interest": 53
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-30",
+      "interest": 9
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-31",
+      "interest": 11
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-04-01",
+      "interest": 11
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-04-02",
+      "interest": 9
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-04-03",
+      "interest": 10
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-04-04",
+      "interest": 7
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-04-05",
+      "interest": 8
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-04-06",
+      "interest": 7
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-04-07",
+      "interest": 10
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-04-08",
+      "interest": 12
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-04-09",
+      "interest": 7
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-04-10",
+      "interest": 9
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-04-11",
+      "interest": 5
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-04-12",
+      "interest": 9
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-04-13",
+      "interest": 11
+    }
+  ],
+  "youtube_videos": [],
+  "collection_log": [
+    {
+      "id": 8,
+      "run_date": "2026-04-13T11:32:39.894423",
+      "collector": "google_trends",
+      "status": "success",
+      "items_found": 0,
+      "items_new": 0,
+      "error": null
+    },
+    {
+      "id": 7,
+      "run_date": "2026-04-13T11:32:28.474988",
+      "collector": "reddit",
+      "status": "success",
+      "items_found": 0,
+      "items_new": 0,
+      "error": null
+    },
+    {
+      "id": 6,
+      "run_date": "2026-04-13T11:32:20.293095",
+      "collector": "discover_articles",
+      "status": "success",
+      "items_found": 0,
+      "items_new": 0,
+      "error": null
+    },
+    {
+      "id": 5,
+      "run_date": "2026-04-13T11:32:18.886852",
+      "collector": "seed_articles",
+      "status": "success",
+      "items_found": 7,
+      "items_new": 0,
+      "error": null
+    },
+    {
+      "id": 4,
+      "run_date": "2026-04-13T11:28:40.584263",
+      "collector": "google_trends",
+      "status": "success",
+      "items_found": 0,
+      "items_new": 0,
+      "error": null
+    },
+    {
+      "id": 3,
+      "run_date": "2026-04-13T11:28:33.390982",
+      "collector": "reddit",
+      "status": "success",
+      "items_found": 0,
+      "items_new": 0,
+      "error": null
+    },
+    {
+      "id": 2,
+      "run_date": "2026-04-13T11:28:24.933903",
+      "collector": "discover_articles",
+      "status": "success",
+      "items_found": 0,
+      "items_new": 0,
+      "error": null
+    },
+    {
+      "id": 1,
+      "run_date": "2026-04-13T11:28:23.619189",
+      "collector": "seed_articles",
+      "status": "success",
+      "items_found": 7,
+      "items_new": 7,
+      "error": null
+    }
+  ],
+  "summary": {
+    "total_articles": 12,
+    "third_party_articles": 8,
+    "microsoft_articles": 4,
+    "reddit_total": 0,
+    "reddit_unique_subs": 0,
+    "youtube_total": 0,
+    "trend_keywords_tracked": 1,
+    "snapshots_count": 1
+  }
+};
+            render();
+        }
+
+        function render() {
+            const s = DATA.latest_snapshot || {};
+            const sum = DATA.summary || {};
+
+            // Header
+            document.getElementById('last-updated').textContent = DATA.generated_at ? new Date(DATA.generated_at).toLocaleString() : '—';
+            document.getElementById('snapshot-count').textContent = sum.snapshots_count || 0;
+
+            // Scorecards
+            const aw = s.awareness_pct || 0;
+            const awEl = document.getElementById('awareness-score');
+            awEl.textContent = aw + '%';
+            awEl.className = 'big-number ' + (aw >= 60 ? 'green' : aw >= 35 ? 'yellow' : 'red');
+            document.getElementById('awareness-bar').style.width = aw + '%';
+            document.getElementById('awareness-bar').style.background = aw >= 60 ? 'var(--green)' : aw >= 35 ? 'var(--yellow)' : 'var(--red)';
+
+            const fav = s.favorability_pct || 0;
+            document.getElementById('favorability-score').textContent = fav + '%';
+            document.getElementById('favorability-bar').style.width = fav + '%';
+
+            document.getElementById('tp-articles').textContent = sum.third_party_articles || 0;
+            document.getElementById('total-articles').textContent = sum.total_articles || 0;
+            document.getElementById('ms-articles').textContent = `${sum.microsoft_articles || 0} Microsoft, ${sum.third_party_articles || 0} third-party`;
+            document.getElementById('reddit-count').textContent = sum.reddit_total || 0;
+            document.getElementById('reddit-subs').textContent = `across ${sum.reddit_unique_subs || 0} subreddits`;
+
+            renderArticles();
+            renderReddit();
+            renderTrends();
+            renderHistory();
+            renderLog();
+            renderVerifyLog();
+        }
+
+        function renderArticles() {
+            const tbody = document.getElementById('articles-table');
+            if (!DATA.articles || DATA.articles.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">No articles tracked yet</td></tr>';
+                return;
+            }
+            tbody.innerHTML = DATA.articles.map(a => `
+                <tr>
+                    <td><a href="${a.url}" target="_blank">${a.title}</a></td>
+                    <td>${a.source}</td>
+                    <td><span class="badge ${a.type}">${a.type === 'third_party' ? '3rd Party' : 'Microsoft'}</span></td>
+                    <td><span class="badge ${a.sentiment}">${a.sentiment}</span></td>
+                    <td>${a.discovered}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderReddit() {
+            const el = document.getElementById('reddit-content');
+            if (!DATA.reddit_mentions || DATA.reddit_mentions.length === 0) {
+                el.innerHTML = `<div class="empty-state"><div class="emoji">🔇</div><p>No Reddit mentions found</p><p style="font-size:12px">This is actually useful data — DSI has zero organic Reddit presence.</p></div>`;
+                return;
+            }
+            el.innerHTML = '<table><thead><tr><th>Subreddit</th><th>Title</th><th>Score</th><th>Comments</th><th>Date</th></tr></thead><tbody>' +
+                DATA.reddit_mentions.map(r => `
+                    <tr>
+                        <td>r/${r.subreddit}</td>
+                        <td><a href="${r.url}" target="_blank">${r.title}</a></td>
+                        <td>${r.score}</td>
+                        <td>${r.num_comments}</td>
+                        <td>${new Date(r.created_utc * 1000).toLocaleDateString()}</td>
+                    </tr>
+                `).join('') + '</tbody></table>';
+        }
+
+        function renderTrends() {
+            const ctx = document.getElementById('trends-chart');
+            if (!DATA.google_trends || DATA.google_trends.length === 0) {
+                ctx.parentElement.innerHTML = `<div class="empty-state"><div class="emoji">📉</div><p>No Google Trends data yet</p><p style="font-size:12px">Trends data will appear after the first successful collection run.</p></div>`;
+                return;
+            }
+
+            const keywords = [...new Set(DATA.google_trends.map(t => t.keyword))];
+            const colors = ['#58a6ff', '#bc8cff', '#3fb950', '#d29922', '#f85149'];
+
+            const datasets = keywords.map((kw, i) => {
+                const points = DATA.google_trends.filter(t => t.keyword === kw);
+                return {
+                    label: kw,
+                    data: points.map(p => ({ x: p.date, y: p.interest })),
+                    borderColor: colors[i % colors.length],
+                    backgroundColor: colors[i % colors.length] + '20',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 2,
+                    borderWidth: 2
+                };
+            });
+
+            new Chart(ctx, {
+                type: 'line',
+                data: { datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { type: 'category', grid: { color: '#30363d' }, ticks: { color: '#8b949e', maxTicksLimit: 12 } },
+                        y: { grid: { color: '#30363d' }, ticks: { color: '#8b949e' }, min: 0, max: 100, title: { display: true, text: 'Interest (0-100)', color: '#8b949e' } }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#e6edf3' } }
+                    }
+                }
+            });
+        }
+
+        function renderHistory() {
+            const snapshots = DATA.snapshots || [];
+
+            // Chart
+            if (snapshots.length > 1) {
+                const ctx = document.getElementById('history-chart');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: snapshots.map(s => s.snapshot_date),
+                        datasets: [
+                            {
+                                label: 'Awareness %',
+                                data: snapshots.map(s => s.awareness_pct),
+                                borderColor: '#d29922',
+                                backgroundColor: '#d2992220',
+                                fill: true, tension: 0.3, borderWidth: 2
+                            },
+                            {
+                                label: 'Favorability %',
+                                data: snapshots.map(s => s.favorability_pct),
+                                borderColor: '#3fb950',
+                                backgroundColor: '#3fb95020',
+                                fill: true, tension: 0.3, borderWidth: 2
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        scales: {
+                            x: { grid: { color: '#30363d' }, ticks: { color: '#8b949e' } },
+                            y: { grid: { color: '#30363d' }, ticks: { color: '#8b949e' }, min: 0, max: 100 }
+                        },
+                        plugins: { legend: { labels: { color: '#e6edf3' } } }
+                    }
+                });
+            }
+
+            // Table
+            const tbody = document.getElementById('history-table');
+            tbody.innerHTML = snapshots.slice().reverse().map(s => `
+                <tr>
+                    <td>${s.snapshot_date}</td>
+                    <td>${s.awareness_pct}%</td>
+                    <td>${s.favorability_pct}%</td>
+                    <td>${s.total_articles} (${s.third_party_articles} 3P)</td>
+                    <td>${s.reddit_mentions}</td>
+                    <td>${s.google_trends_avg}</td>
+                    <td>${s.composite_score}/10</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderLog() {
+            const el = document.getElementById('log-content');
+            if (!DATA.collection_log || DATA.collection_log.length === 0) {
+                el.innerHTML = '<div class="empty-state"><p>No collection runs yet</p></div>';
+                return;
+            }
+            el.innerHTML = DATA.collection_log.map(l => `
+                <div class="log-entry">
+                    <span style="color:var(--text-muted)">${new Date(l.run_date).toLocaleString()}</span>
+                    &nbsp;[<span class="${l.status}">${l.status}</span>]
+                    &nbsp;${l.collector}
+                    ${l.items_found ? ` — ${l.items_found} found, ${l.items_new} new` : ''}
+                    ${l.error ? ` <span class="error">⚠ ${l.error}</span>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function renderVerifyLog() {
+            const el = document.getElementById('verify-log');
+            if (!DATA.collection_log || DATA.collection_log.length === 0) {
+                el.innerHTML = '<p style="color:var(--text-muted)">No collection runs recorded yet.</p>';
+                return;
+            }
+
+            const successful = DATA.collection_log.filter(l => l.status === 'success');
+            const errors = DATA.collection_log.filter(l => l.status === 'error');
+            const latest = DATA.collection_log[0];
+
+            el.innerHTML = `
+                <table>
+                    <thead><tr><th>Metric</th><th>Value</th></tr></thead>
+                    <tbody>
+                        <tr><td>Last collection run</td><td>${new Date(latest.run_date).toLocaleString()}</td></tr>
+                        <tr><td>Total successful runs</td><td>${successful.length}</td></tr>
+                        <tr><td>Total errors</td><td>${errors.length}</td></tr>
+                        <tr><td>Data points in database</td><td>${(DATA.summary.total_articles || 0)} articles + ${(DATA.summary.reddit_total || 0)} Reddit + ${(DATA.google_trends || []).length} trend points</td></tr>
+                    </tbody>
+                </table>
+                <p style="color: var(--text-muted); font-size: 12px; margin-top: 8px;">
+                    Raw data is stored in <code>dsi_awareness.db</code> (SQLite). Open with <a href="https://sqlitebrowser.org/" target="_blank" style="color: var(--accent);">DB Browser for SQLite</a> to inspect.
+                </p>
+            `;
+        }
+
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        loadData();
+    </script>
+</body>
+</html>

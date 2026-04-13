@@ -1,0 +1,700 @@
+{
+  "generated_at": "2026-04-13T11:51:38.230634",
+  "latest_snapshot": {
+    "id": 3,
+    "snapshot_date": "2026-04-13",
+    "total_articles": 12,
+    "third_party_articles": 8,
+    "microsoft_articles": 4,
+    "reddit_mentions": 0,
+    "reddit_total_score": 0,
+    "youtube_videos": 0,
+    "google_trends_avg": 9,
+    "composite_score": 3.88,
+    "awareness_pct": 38.8,
+    "favorability_pct": 91.7,
+    "notes": "Auto-generated 2026-04-13T11:32:39.899426"
+  },
+  "snapshots": [
+    {
+      "id": 3,
+      "snapshot_date": "2026-04-13",
+      "total_articles": 12,
+      "third_party_articles": 8,
+      "microsoft_articles": 4,
+      "reddit_mentions": 0,
+      "reddit_total_score": 0,
+      "youtube_videos": 0,
+      "google_trends_avg": 9,
+      "composite_score": 3.88,
+      "awareness_pct": 38.8,
+      "favorability_pct": 91.7,
+      "notes": "Auto-generated 2026-04-13T11:32:39.899426"
+    }
+  ],
+  "articles": [
+    {
+      "id": "41bd5550779e",
+      "url": "https://techcommunity.microsoft.com/blog/microsoft-security-blog/microsoft-purview-data-security-investigations-is-now-generally-available/4489363",
+      "title": "Microsoft Purview Data Security Investigations is now generally available",
+      "source": "Microsoft Tech Community",
+      "type": "microsoft",
+      "sentiment": "positive",
+      "discovered": "2026-04-13",
+      "last_checked": "2026-04-13"
+    },
+    {
+      "id": "5c751dc224ef",
+      "url": "https://mc.merill.net/message/MC1266016",
+      "title": "MC1266016: Personal Data Examination",
+      "source": "Merill (MC aggregator)",
+      "type": "third_party",
+      "sentiment": "positive",
+      "discovered": "2026-04-13",
+      "last_checked": "2026-04-13"
+    },
+    {
+      "id": "a30e4ec48076",
+      "url": "https://azurefeeds.com/2026/01/27/microsoft-purview-data-security-investigations-is-now-generally-available/",
+      "title": "DSI is now GA",
+      "source": "AzureFeeds",
+      "type": "third_party",
+      "sentiment": "positive",
+      "discovered": "2026-04-13",
+      "last_checked": "2026-04-13"
+    },
+    {
+      "id": "9910e6c8ee53",
+      "url": "https://m365admin.handsontek.net/microsoft-purview-data-security-investigations-introducing-new-personal-data-examination-2/",
+      "title": "Personal data examination",
+      "source": "HandsOnTek",
+      "type": "third_party",
+      "sentiment": "positive",
+      "discovered": "2026-04-13",
+      "last_checked": "2026-04-13"
+    },
+    {
+      "id": "b1642d5845ae",
+      "url": "https://www.peerspot.com/products/microsoft-purview-ediscovery-reviews",
+      "title": "Microsoft Purview eDiscovery Reviews (covers DSI)",
+      "source": "PeerSpot",
+      "type": "third_party",
+      "sentiment": "mixed",
+      "discovered": "2026-04-13",
+      "last_checked": "2026-04-13"
+    },
+    {
+      "id": "f37775975062",
+      "url": "https://www.helpnetsecurity.com/2026/01/27/microsoft-purview-data-security-investigations/",
+      "title": "Microsoft brings AI-powered investigations to security teams",
+      "source": "HelpNetSecurity",
+      "type": "third_party",
+      "sentiment": "positive",
+      "discovered": "2026-04-07",
+      "last_checked": "2026-04-13"
+    },
+    {
+      "id": "faee9c9bd42d",
+      "url": "https://petri.com/microsoft-purview-ai-data-breach-investigations/",
+      "title": "Microsoft Purview Gets AI Tool for Faster Data Breach Investigations",
+      "source": "Petri",
+      "type": "third_party",
+      "sentiment": "positive",
+      "discovered": "2026-04-07",
+      "last_checked": "2026-04-13"
+    },
+    {
+      "id": "b71ef7a79ff8",
+      "url": "https://4sysops.com/archives/microsoft-purview-data-security-investigations-ai-powered-threat-detection-for-microsoft-365/",
+      "title": "AI-powered threat detection for Microsoft 365",
+      "source": "4sysops",
+      "type": "third_party",
+      "sentiment": "positive",
+      "discovered": "2026-04-07",
+      "last_checked": "2026-04-13"
+    },
+    {
+      "id": "d2c4ba73d0ed",
+      "url": "https://office365itpros.com/2026/01/06/data-security-investigation/",
+      "title": "A Quick Look at Purview Data Security Investigations",
+      "source": "Office365ItPros",
+      "type": "third_party",
+      "sentiment": "mixed",
+      "discovered": "2026-04-07",
+      "last_checked": "2026-04-13"
+    },
+    {
+      "id": "116fb93e615c",
+      "url": "https://techcommunity.microsoft.com/blog/microsoft-security-blog/accelerate-data-security-investigations-with-ai-powered-deep-content-analysis/4396099",
+      "title": "Accelerate data security investigations with AI",
+      "source": "Microsoft Tech Community",
+      "type": "microsoft",
+      "sentiment": "positive",
+      "discovered": "2026-04-07",
+      "last_checked": "2026-04-13"
+    },
+    {
+      "id": "1cc1522221c2",
+      "url": "https://techcommunity.microsoft.com/blog/microsoftmechanicsblog/introducing-microsoft-purview-data-security-investigations/4396678",
+      "title": "Introducing DSI (Microsoft Mechanics)",
+      "source": "Microsoft Tech Community",
+      "type": "microsoft",
+      "sentiment": "positive",
+      "discovered": "2026-04-07",
+      "last_checked": "2026-04-13"
+    },
+    {
+      "id": "3daf27211dff",
+      "url": "https://techcommunity.microsoft.com/blog/microsoft-security-blog/secure-data-as-ai-scales-new-microsoft-purview-innovations-at-rsa-2026/4503665",
+      "title": "RSA 2026 Purview innovations",
+      "source": "Microsoft Tech Community",
+      "type": "microsoft",
+      "sentiment": "positive",
+      "discovered": "2026-04-07",
+      "last_checked": "2026-04-13"
+    }
+  ],
+  "reddit_mentions": [],
+  "google_trends": [
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-13",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-14",
+      "interest": 74
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-15",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-16",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-17",
+      "interest": 48
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-18",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-19",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-20",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-21",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-22",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-23",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-24",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-25",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-26",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-27",
+      "interest": 75
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-28",
+      "interest": 50
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-29",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-30",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-01-31",
+      "interest": 52
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-01",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-02",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-03",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-04",
+      "interest": 64
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-05",
+      "interest": 56
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-06",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-07",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-08",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-09",
+      "interest": 47
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-10",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-11",
+      "interest": 44
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-12",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-13",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-14",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-15",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-16",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-17",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-18",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-19",
+      "interest": 45
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-20",
+      "interest": 53
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-21",
+      "interest": 49
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-22",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-23",
+      "interest": 60
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-24",
+      "interest": 48
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-25",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-26",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-27",
+      "interest": 100
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-02-28",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-01",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-02",
+      "interest": 43
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-03",
+      "interest": 52
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-04",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-05",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-06",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-07",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-08",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-09",
+      "interest": 49
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-10",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-11",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-12",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-13",
+      "interest": 46
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-14",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-15",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-16",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-17",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-18",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-19",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-20",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-21",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-22",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-23",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-24",
+      "interest": 51
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-25",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-26",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-27",
+      "interest": 0
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-28",
+      "interest": 47
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-29",
+      "interest": 53
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-30",
+      "interest": 9
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-03-31",
+      "interest": 11
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-04-01",
+      "interest": 11
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-04-02",
+      "interest": 9
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-04-03",
+      "interest": 10
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-04-04",
+      "interest": 7
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-04-05",
+      "interest": 8
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-04-06",
+      "interest": 7
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-04-07",
+      "interest": 10
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-04-08",
+      "interest": 12
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-04-09",
+      "interest": 7
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-04-10",
+      "interest": 9
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-04-11",
+      "interest": 5
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-04-12",
+      "interest": 9
+    },
+    {
+      "keyword": "data security investigations",
+      "date": "2026-04-13",
+      "interest": 11
+    }
+  ],
+  "youtube_videos": [],
+  "collection_log": [
+    {
+      "id": 8,
+      "run_date": "2026-04-13T11:32:39.894423",
+      "collector": "google_trends",
+      "status": "success",
+      "items_found": 0,
+      "items_new": 0,
+      "error": null
+    },
+    {
+      "id": 7,
+      "run_date": "2026-04-13T11:32:28.474988",
+      "collector": "reddit",
+      "status": "success",
+      "items_found": 0,
+      "items_new": 0,
+      "error": null
+    },
+    {
+      "id": 6,
+      "run_date": "2026-04-13T11:32:20.293095",
+      "collector": "discover_articles",
+      "status": "success",
+      "items_found": 0,
+      "items_new": 0,
+      "error": null
+    },
+    {
+      "id": 5,
+      "run_date": "2026-04-13T11:32:18.886852",
+      "collector": "seed_articles",
+      "status": "success",
+      "items_found": 7,
+      "items_new": 0,
+      "error": null
+    },
+    {
+      "id": 4,
+      "run_date": "2026-04-13T11:28:40.584263",
+      "collector": "google_trends",
+      "status": "success",
+      "items_found": 0,
+      "items_new": 0,
+      "error": null
+    },
+    {
+      "id": 3,
+      "run_date": "2026-04-13T11:28:33.390982",
+      "collector": "reddit",
+      "status": "success",
+      "items_found": 0,
+      "items_new": 0,
+      "error": null
+    },
+    {
+      "id": 2,
+      "run_date": "2026-04-13T11:28:24.933903",
+      "collector": "discover_articles",
+      "status": "success",
+      "items_found": 0,
+      "items_new": 0,
+      "error": null
+    },
+    {
+      "id": 1,
+      "run_date": "2026-04-13T11:28:23.619189",
+      "collector": "seed_articles",
+      "status": "success",
+      "items_found": 7,
+      "items_new": 7,
+      "error": null
+    }
+  ],
+  "summary": {
+    "total_articles": 12,
+    "third_party_articles": 8,
+    "microsoft_articles": 4,
+    "reddit_total": 0,
+    "reddit_unique_subs": 0,
+    "youtube_total": 0,
+    "trend_keywords_tracked": 1,
+    "snapshots_count": 1
+  }
+}
