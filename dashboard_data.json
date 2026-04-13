@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-13T11:51:38.230634",
+  "generated_at": "2026-04-13T12:05:13.780347",
   "latest_snapshot": {
     "id": 3,
     "snapshot_date": "2026-04-13",
@@ -34,34 +34,15 @@
   ],
   "articles": [
     {
-      "id": "41bd5550779e",
-      "url": "https://techcommunity.microsoft.com/blog/microsoft-security-blog/microsoft-purview-data-security-investigations-is-now-generally-available/4489363",
-      "title": "Microsoft Purview Data Security Investigations is now generally available",
+      "id": "3daf27211dff",
+      "url": "https://techcommunity.microsoft.com/blog/microsoft-security-blog/secure-data-as-ai-scales-new-microsoft-purview-innovations-at-rsa-2026/4503665",
+      "title": "RSA 2026 Purview innovations",
       "source": "Microsoft Tech Community",
       "type": "microsoft",
       "sentiment": "positive",
-      "discovered": "2026-04-13",
-      "last_checked": "2026-04-13"
-    },
-    {
-      "id": "5c751dc224ef",
-      "url": "https://mc.merill.net/message/MC1266016",
-      "title": "MC1266016: Personal Data Examination",
-      "source": "Merill (MC aggregator)",
-      "type": "third_party",
-      "sentiment": "positive",
-      "discovered": "2026-04-13",
-      "last_checked": "2026-04-13"
-    },
-    {
-      "id": "a30e4ec48076",
-      "url": "https://azurefeeds.com/2026/01/27/microsoft-purview-data-security-investigations-is-now-generally-available/",
-      "title": "DSI is now GA",
-      "source": "AzureFeeds",
-      "type": "third_party",
-      "sentiment": "positive",
-      "discovered": "2026-04-13",
-      "last_checked": "2026-04-13"
+      "discovered": "2026-04-07",
+      "last_checked": "2026-04-13",
+      "published_date": "2026-04-01"
     },
     {
       "id": "9910e6c8ee53",
@@ -71,17 +52,19 @@
       "type": "third_party",
       "sentiment": "positive",
       "discovered": "2026-04-13",
-      "last_checked": "2026-04-13"
+      "last_checked": "2026-04-13",
+      "published_date": "2026-03-20"
     },
     {
-      "id": "b1642d5845ae",
-      "url": "https://www.peerspot.com/products/microsoft-purview-ediscovery-reviews",
-      "title": "Microsoft Purview eDiscovery Reviews (covers DSI)",
-      "source": "PeerSpot",
+      "id": "5c751dc224ef",
+      "url": "https://mc.merill.net/message/MC1266016",
+      "title": "MC1266016: Personal Data Examination",
+      "source": "Merill (MC aggregator)",
       "type": "third_party",
-      "sentiment": "mixed",
+      "sentiment": "positive",
       "discovered": "2026-04-13",
-      "last_checked": "2026-04-13"
+      "last_checked": "2026-04-13",
+      "published_date": "2026-03-15"
     },
     {
       "id": "f37775975062",
@@ -91,7 +74,8 @@
       "type": "third_party",
       "sentiment": "positive",
       "discovered": "2026-04-07",
-      "last_checked": "2026-04-13"
+      "last_checked": "2026-04-13",
+      "published_date": "2026-01-27"
     },
     {
       "id": "faee9c9bd42d",
@@ -101,7 +85,30 @@
       "type": "third_party",
       "sentiment": "positive",
       "discovered": "2026-04-07",
-      "last_checked": "2026-04-13"
+      "last_checked": "2026-04-13",
+      "published_date": "2026-01-27"
+    },
+    {
+      "id": "41bd5550779e",
+      "url": "https://techcommunity.microsoft.com/blog/microsoft-security-blog/microsoft-purview-data-security-investigations-is-now-generally-available/4489363",
+      "title": "Microsoft Purview Data Security Investigations is now generally available",
+      "source": "Microsoft Tech Community",
+      "type": "microsoft",
+      "sentiment": "positive",
+      "discovered": "2026-04-13",
+      "last_checked": "2026-04-13",
+      "published_date": "2026-01-27"
+    },
+    {
+      "id": "a30e4ec48076",
+      "url": "https://azurefeeds.com/2026/01/27/microsoft-purview-data-security-investigations-is-now-generally-available/",
+      "title": "DSI is now GA",
+      "source": "AzureFeeds",
+      "type": "third_party",
+      "sentiment": "positive",
+      "discovered": "2026-04-13",
+      "last_checked": "2026-04-13",
+      "published_date": "2026-01-27"
     },
     {
       "id": "b71ef7a79ff8",
@@ -111,7 +118,8 @@
       "type": "third_party",
       "sentiment": "positive",
       "discovered": "2026-04-07",
-      "last_checked": "2026-04-13"
+      "last_checked": "2026-04-13",
+      "published_date": "2026-01-15"
     },
     {
       "id": "d2c4ba73d0ed",
@@ -121,7 +129,19 @@
       "type": "third_party",
       "sentiment": "mixed",
       "discovered": "2026-04-07",
-      "last_checked": "2026-04-13"
+      "last_checked": "2026-04-13",
+      "published_date": "2026-01-06"
+    },
+    {
+      "id": "b1642d5845ae",
+      "url": "https://www.peerspot.com/products/microsoft-purview-ediscovery-reviews",
+      "title": "Microsoft Purview eDiscovery Reviews (covers DSI)",
+      "source": "PeerSpot",
+      "type": "third_party",
+      "sentiment": "mixed",
+      "discovered": "2026-04-13",
+      "last_checked": "2026-04-13",
+      "published_date": "2025-12-01"
     },
     {
       "id": "116fb93e615c",
@@ -131,7 +151,8 @@
       "type": "microsoft",
       "sentiment": "positive",
       "discovered": "2026-04-07",
-      "last_checked": "2026-04-13"
+      "last_checked": "2026-04-13",
+      "published_date": "2025-10-15"
     },
     {
       "id": "1cc1522221c2",
@@ -141,17 +162,8 @@
       "type": "microsoft",
       "sentiment": "positive",
       "discovered": "2026-04-07",
-      "last_checked": "2026-04-13"
-    },
-    {
-      "id": "3daf27211dff",
-      "url": "https://techcommunity.microsoft.com/blog/microsoft-security-blog/secure-data-as-ai-scales-new-microsoft-purview-innovations-at-rsa-2026/4503665",
-      "title": "RSA 2026 Purview innovations",
-      "source": "Microsoft Tech Community",
-      "type": "microsoft",
-      "sentiment": "positive",
-      "discovered": "2026-04-07",
-      "last_checked": "2026-04-13"
+      "last_checked": "2026-04-13",
+      "published_date": "2025-10-15"
     }
   ],
   "reddit_mentions": [],

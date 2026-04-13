@@ -216,11 +216,51 @@ def discover_articles_bing(conn, config):
 # --- Reddit Collection ---
 
 def collect_reddit(conn, config):
-    """Search Reddit for DSI mentions using the JSON API (no auth needed)."""
+    """Search Reddit for DSI mentions. Uses PRAW (OAuth) if credentials exist, falls back to JSON API."""
     new_count = 0
     total_found = 0
     c = conn.cursor()
 
+    # Try PRAW first (requires credentials in config.json under "reddit_credentials")
+    creds = config.get("reddit_credentials", {})
+    if creds.get("client_id") and creds.get("client_secret"):
+        try:
+            import praw
+            reddit = praw.Reddit(
+                client_id=creds["client_id"],
+                client_secret=creds["client_secret"],
+                user_agent="DSI-Awareness-Pulse/1.0 (by /u/dsi-pulse-bot)"
+            )
+            for term in config.get("search_terms", []):
+                for sub_name in config.get("reddit_subreddits", []):
+                    try:
+                        subreddit = reddit.subreddit(sub_name)
+                        for post in subreddit.search(term, sort="new", limit=25):
+                            total_found += 1
+                            rid = make_id(post.id)
+                            existing = c.execute("SELECT id FROM reddit_mentions WHERE id = ?", (rid,)).fetchone()
+                            if not existing:
+                                c.execute(
+                                    "INSERT INTO reddit_mentions (id, subreddit, title, url, author, score, num_comments, created_utc, discovered, search_term) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                                    (rid, sub_name, post.title, f"https://reddit.com{post.permalink}",
+                                     str(post.author), post.score, post.num_comments,
+                                     post.created_utc, datetime.now().strftime("%Y-%m-%d"), term)
+                                )
+                                new_count += 1
+                        time.sleep(1)
+                    except Exception as e:
+                        print(f"  Reddit: error on r/{sub_name} for '{term}': {e}")
+
+            conn.commit()
+            log_collection(conn, "reddit_praw", "success", total_found, new_count)
+            print(f"  Reddit (PRAW): found {total_found} posts, {new_count} new")
+            return new_count
+        except ImportError:
+            print("  Reddit: PRAW not installed, falling back to JSON API")
+        except Exception as e:
+            print(f"  Reddit: PRAW error ({e}), falling back to JSON API")
+
+    # Fallback: JSON API (often blocked by Reddit, but worth trying)
     for term in config.get("search_terms", []):
         for sub in config.get("reddit_subreddits", []):
             try:
@@ -250,9 +290,13 @@ def collect_reddit(conn, config):
                         )
                         new_count += 1
 
-                time.sleep(3)  # Reddit rate limit
+                time.sleep(3)
             except Exception as e:
                 print(f"  Reddit: error on r/{sub} for '{term}': {e}")
+
+    if total_found == 0 and not creds.get("client_id"):
+        print("  Reddit: 0 results (API likely blocking). Set up PRAW credentials for reliable access.")
+        print("  Reddit: Go to https://www.reddit.com/prefs/apps → create 'script' app → add to config.json")
 
     conn.commit()
     log_collection(conn, "reddit", "success", total_found, new_count)
@@ -390,7 +434,7 @@ def export_dashboard_data(conn):
     ).fetchall()]
 
     articles = [dict(r) for r in c.execute(
-        "SELECT * FROM articles ORDER BY discovered DESC"
+        "SELECT * FROM articles ORDER BY COALESCE(published_date, discovered) DESC"
     ).fetchall()]
 
     reddit = [dict(r) for r in c.execute(

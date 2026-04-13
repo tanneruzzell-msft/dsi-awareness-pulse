@@ -267,7 +267,7 @@
             <h2>All Tracked Articles</h2>
             <table>
                 <thead>
-                    <tr><th>Title</th><th>Source</th><th>Type</th><th>Sentiment</th><th>Discovered</th></tr>
+                    <tr><th>Title</th><th>Source</th><th>Type</th><th>Sentiment</th><th>Published</th><th>Discovered</th></tr>
                 </thead>
                 <tbody id="articles-table"></tbody>
             </table>
@@ -436,6 +436,7 @@
                     <td>${a.source}</td>
                     <td><span class="badge ${a.type}">${a.type === 'third_party' ? '3rd Party' : 'Microsoft'}</span></td>
                     <td><span class="badge ${a.sentiment}">${a.sentiment}</span></td>
+                    <td>${a.published_date || '—'}</td>
                     <td>${a.discovered}</td>
                 </tr>
             `).join('');
