@@ -432,7 +432,7 @@ async function flagEntry(id) {
     if (reason === null) return;
     const resp = await fetch('/api/flag', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, reason: reason || 'false positive' }) });
     const result = await resp.json();
-    if (result.ok) { showToast('Flagged — excluded from scores'); loadData(); }
+    if (result.ok) { showToast('Flagged + learned pattern — future runs will filter similar entries'); loadData(); }
     else showToast('Failed to flag', true);
 }
 
@@ -454,7 +454,7 @@ async function addEntry() {
     const resp = await fetch('/api/add', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     const result = await resp.json();
     if (result.ok) {
-        showToast('Added! Refresh data to update scores.');
+        showToast('Added + config updated — future runs will find similar entries');
         document.getElementById('add-url').value = '';
         document.getElementById('add-title').value = '';
         document.getElementById('add-source').value = '';

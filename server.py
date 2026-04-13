@@ -10,6 +10,7 @@ Usage:
 import sqlite3
 import json
 import hashlib
+import re
 import argparse
 from datetime import datetime
 from pathlib import Path
@@ -17,6 +18,8 @@ from flask import Flask, jsonify, request, send_file, send_from_directory
 
 SCRIPT_DIR = Path(__file__).parent
 DB_PATH = SCRIPT_DIR / "dsi_awareness.db"
+CONFIG_PATH = SCRIPT_DIR / "config.json"
+LEARNED_PATH = SCRIPT_DIR / "learned.json"
 
 app = Flask(__name__, static_folder=str(SCRIPT_DIR))
 
@@ -41,6 +44,112 @@ def get_db():
 
 def make_id(text):
     return hashlib.md5(text.encode()).hexdigest()[:12]
+
+
+def load_json(path):
+    with open(path, "r") as f:
+        return json.load(f)
+
+
+def save_json(path, data):
+    with open(path, "w") as f:
+        json.dump(data, f, indent=4)
+
+
+def learn_from_flag(entry_id, reason, entry_data):
+    """Update learned.json when a false positive is flagged."""
+    learned = load_json(LEARNED_PATH)
+    config = load_json(CONFIG_PATH)
+
+    title = entry_data.get("title", "")
+    subreddit = entry_data.get("subreddit", "")
+
+    # Extract distinctive words from the title to build exclusion patterns
+    stop_words = {"the", "a", "an", "in", "on", "at", "to", "for", "of", "and", "or", "is", "it",
+                  "this", "that", "with", "from", "by", "are", "was", "were", "be", "has", "have",
+                  "had", "do", "does", "did", "will", "would", "could", "should", "may", "might",
+                  "not", "no", "if", "but", "so", "as", "what", "how", "who", "which", "when",
+                  "where", "why", "can", "all", "each", "every", "my", "your", "our", "their",
+                  "its", "i", "you", "he", "she", "we", "they", "me", "him", "her", "us", "them",
+                  "new", "about", "just", "get", "got", "here", "there", "been", "being", "up",
+                  "out", "any", "some", "more", "most", "other", "than", "then", "also", "after",
+                  "before", "between", "through", "into", "over", "under", "does", "anyone"}
+
+    # Only learn from titles that are clearly not about DSI
+    title_words = set(re.findall(r'\b[a-zA-Z]{3,}\b', title.lower())) - stop_words
+    # Remove words that ARE related to DSI to avoid excluding good results
+    dsi_words = {"purview", "dsi", "security", "investigation", "investigations", "data",
+                 "microsoft", "compliance", "insider", "threat", "breach", "ediscovery"}
+    distinctive_words = title_words - dsi_words
+
+    # If the title has very distinctive non-DSI words, add them as exclusion patterns
+    if distinctive_words and len(distinctive_words) <= 6:
+        # Use multi-word patterns to avoid over-filtering
+        pattern_candidates = [w for w in distinctive_words if len(w) >= 4]
+        for word in pattern_candidates[:3]:
+            if word not in learned.get("exclude_title_patterns", []):
+                learned.setdefault("exclude_title_patterns", []).append(word)
+
+    # Track subreddit flag rates
+    if subreddit:
+        conn = get_db()
+        total_from_sub = conn.execute(
+            "SELECT COUNT(*) FROM reddit_mentions WHERE subreddit = ?", (subreddit,)
+        ).fetchone()[0]
+        flagged_from_sub = conn.execute(
+            "SELECT COUNT(*) FROM reddit_mentions WHERE subreddit = ? AND flagged = 1", (subreddit,)
+        ).fetchone()[0]
+        conn.close()
+
+        flag_rate = flagged_from_sub / max(total_from_sub, 1)
+        # If >75% of posts from this sub are flagged, exclude it
+        if flag_rate > 0.75 and total_from_sub >= 3:
+            if subreddit not in learned.get("exclude_subreddits", []):
+                learned.setdefault("exclude_subreddits", []).append(subreddit)
+            # Also remove from config if it's there
+            if subreddit in config.get("reddit_subreddits", []):
+                config["reddit_subreddits"].remove(subreddit)
+                save_json(CONFIG_PATH, config)
+
+    save_json(LEARNED_PATH, learned)
+
+
+def learn_from_add(url, title, source, subreddit=None):
+    """Update config when a missed entry is added."""
+    learned = load_json(LEARNED_PATH)
+    config = load_json(CONFIG_PATH)
+    changed = False
+
+    # If it's a Reddit post from a sub we don't monitor, add it
+    if subreddit and subreddit not in config.get("reddit_subreddits", []):
+        if subreddit not in learned.get("exclude_subreddits", []):
+            config.setdefault("reddit_subreddits", []).append(subreddit)
+            learned.setdefault("include_subreddits", []).append(subreddit)
+            changed = True
+
+    # If it's an article from a source we haven't seen, track it
+    if source and source != "unknown":
+        known_sources = [a.get("source", "") for a in config.get("known_articles", [])]
+        if source not in known_sources:
+            if source not in learned.get("include_sources", []):
+                learned.setdefault("include_sources", []).append(source)
+
+    # Add to known_articles in config so it persists across DB resets
+    existing_urls = [a["url"] for a in config.get("known_articles", [])]
+    if url not in existing_urls:
+        config.setdefault("known_articles", []).append({
+            "url": url,
+            "title": title or url,
+            "source": source or "unknown",
+            "type": "microsoft" if "microsoft.com" in url else "third_party",
+            "sentiment": "unknown",
+            "discovered": datetime.now().strftime("%Y-%m-%d")
+        })
+        changed = True
+
+    if changed:
+        save_json(CONFIG_PATH, config)
+    save_json(LEARNED_PATH, learned)
 
 
 # --- Pages ---
@@ -97,13 +206,23 @@ def api_flag():
     reason = body.get("reason", "false positive")
 
     conn = get_db()
-    cur = conn.execute("UPDATE articles SET flagged = 1, flag_reason = ? WHERE id = ?", (reason, entry_id))
-    if cur.rowcount == 0:
-        cur = conn.execute("UPDATE reddit_mentions SET flagged = 1, flag_reason = ? WHERE id = ?", (reason, entry_id))
 
+    # Get entry data before flagging (for learning)
+    entry = conn.execute("SELECT * FROM articles WHERE id = ?", (entry_id,)).fetchone()
+    table = "articles"
+    if not entry:
+        entry = conn.execute("SELECT * FROM reddit_mentions WHERE id = ?", (entry_id,)).fetchone()
+        table = "reddit_mentions"
+
+    cur = conn.execute(f"UPDATE {table} SET flagged = 1, flag_reason = ? WHERE id = ?", (reason, entry_id))
     conn.commit()
+
+    # Learn from this flag
+    if entry:
+        learn_from_flag(entry_id, reason, dict(entry))
+
     conn.close()
-    return jsonify({"ok": cur.rowcount > 0, "id": entry_id})
+    return jsonify({"ok": cur.rowcount > 0, "id": entry_id, "learned": True})
 
 
 @app.route("/api/unflag", methods=["POST"])
@@ -143,10 +262,15 @@ def api_add():
         return jsonify({"ok": False, "error": "Already tracked"})
 
     is_reddit = "reddit.com" in url
+    subreddit = None
     if is_reddit:
+        # Extract subreddit from URL
+        import re as re_mod
+        m = re_mod.search(r'/r/([^/]+)', url)
+        subreddit = m.group(1) if m else source
         conn.execute(
             "INSERT INTO reddit_mentions (id, subreddit, title, url, author, score, num_comments, created_utc, discovered, search_term, manually_added) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
-            (aid, source, title, url, "", 0, 0, 0, datetime.now().strftime("%Y-%m-%d"), "manual", 1)
+            (aid, subreddit or source, title, url, "", 0, 0, 0, datetime.now().strftime("%Y-%m-%d"), "manual", 1)
         )
     else:
         conn.execute(
@@ -157,7 +281,11 @@ def api_add():
 
     conn.commit()
     conn.close()
-    return jsonify({"ok": True, "id": aid, "type": "reddit" if is_reddit else "article"})
+
+    # Learn from this addition
+    learn_from_add(url, title, source, subreddit)
+
+    return jsonify({"ok": True, "id": aid, "type": "reddit" if is_reddit else "article", "learned": True})
 
 
 @app.route("/api/refresh", methods=["POST"])
@@ -170,6 +298,13 @@ def api_refresh():
         capture_output=True, text=True, cwd=str(SCRIPT_DIR), timeout=120
     )
     return jsonify({"ok": result.returncode == 0, "output": result.stdout, "errors": result.stderr})
+
+
+@app.route("/api/learned")
+def api_learned():
+    """Return the current learned patterns."""
+    learned = load_json(LEARNED_PATH)
+    return jsonify(learned)
 
 
 if __name__ == "__main__":

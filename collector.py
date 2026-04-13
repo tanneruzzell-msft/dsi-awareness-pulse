@@ -26,6 +26,7 @@ from bs4 import BeautifulSoup
 SCRIPT_DIR = Path(__file__).parent
 DB_PATH = SCRIPT_DIR / "dsi_awareness.db"
 CONFIG_PATH = SCRIPT_DIR / "config.json"
+LEARNED_PATH = SCRIPT_DIR / "learned.json"
 DASHBOARD_DATA_PATH = SCRIPT_DIR / "dashboard_data.json"
 
 HEADERS = {
@@ -36,6 +37,28 @@ HEADERS = {
 def load_config():
     with open(CONFIG_PATH, "r") as f:
         return json.load(f)
+
+
+def load_learned():
+    if LEARNED_PATH.exists():
+        with open(LEARNED_PATH, "r") as f:
+            return json.load(f)
+    return {"exclude_title_patterns": [], "exclude_subreddits": []}
+
+
+def is_false_positive(title, subreddit=None):
+    """Check if an entry matches learned false positive patterns."""
+    learned = load_learned()
+    title_lower = title.lower()
+
+    for pattern in learned.get("exclude_title_patterns", []):
+        if pattern.lower() in title_lower:
+            return True
+
+    if subreddit and subreddit in learned.get("exclude_subreddits", []):
+        return True
+
+    return False
 
 
 def init_db():
@@ -308,6 +331,7 @@ def _collect_reddit_pullpush(conn, config):
     """Fallback: use PullPush Reddit archive API (no auth needed, indexes all of Reddit)."""
     new_count = 0
     total_found = 0
+    skipped = 0
     c = conn.cursor()
 
     for term in config.get("search_terms", []):
@@ -321,12 +345,20 @@ def _collect_reddit_pullpush(conn, config):
             posts = resp.json().get("data", [])
             for p in posts:
                 total_found += 1
+                title = p.get("title", "")
+                subreddit = p.get("subreddit", "")
+
+                # Skip learned false positive patterns
+                if is_false_positive(title, subreddit):
+                    skipped += 1
+                    continue
+
                 rid = make_id(p.get("id", str(time.time())))
                 existing = c.execute("SELECT id FROM reddit_mentions WHERE id = ?", (rid,)).fetchone()
                 if not existing:
                     c.execute(
                         "INSERT INTO reddit_mentions (id, subreddit, title, url, author, score, num_comments, created_utc, discovered, search_term) VALUES (?,?,?,?,?,?,?,?,?,?)",
-                        (rid, p.get("subreddit", ""), p.get("title", ""),
+                        (rid, subreddit, title,
                          f"https://reddit.com{p.get('permalink', '')}",
                          p.get("author", ""), p.get("score", 0), p.get("num_comments", 0),
                          p.get("created_utc", 0), datetime.now().strftime("%Y-%m-%d"), term)
@@ -336,6 +368,9 @@ def _collect_reddit_pullpush(conn, config):
             time.sleep(2)
         except Exception as e:
             print(f"  PullPush: error for '{term}': {e}")
+
+    if skipped:
+        print(f"  PullPush: skipped {skipped} entries matching learned false-positive patterns")
 
     conn.commit()
     return total_found, new_count

@@ -1,35 +1,35 @@
 {
-  "generated_at": "2026-04-13T12:35:56.512060",
+  "generated_at": "2026-04-13T12:50:14.149556",
   "latest_snapshot": {
-    "id": 8,
+    "id": 9,
     "snapshot_date": "2026-04-13",
     "total_articles": 12,
     "third_party_articles": 8,
     "microsoft_articles": 4,
-    "reddit_mentions": 45,
-    "reddit_total_score": 716,
+    "reddit_mentions": 44,
+    "reddit_total_score": 715,
     "youtube_videos": 0,
     "google_trends_avg": 9,
     "composite_score": 5.88,
     "awareness_pct": 58.8,
     "favorability_pct": 91.7,
-    "notes": "Auto-generated 2026-04-13T12:35:56.512060"
+    "notes": "Auto-generated 2026-04-13T12:50:14.145546"
   },
   "snapshots": [
     {
-      "id": 8,
+      "id": 9,
       "snapshot_date": "2026-04-13",
       "total_articles": 12,
       "third_party_articles": 8,
       "microsoft_articles": 4,
-      "reddit_mentions": 45,
-      "reddit_total_score": 716,
+      "reddit_mentions": 44,
+      "reddit_total_score": 715,
       "youtube_videos": 0,
       "google_trends_avg": 9,
       "composite_score": 5.88,
       "awareness_pct": 58.8,
       "favorability_pct": 91.7,
-      "notes": "Auto-generated 2026-04-13T12:35:56.512060"
+      "notes": "Auto-generated 2026-04-13T12:50:14.145546"
     }
   ],
   "articles": [
@@ -439,8 +439,8 @@
       "created_utc": 1718689333.0,
       "discovered": "2026-04-13",
       "search_term": "data security investigations purview",
-      "flagged": 0,
-      "flag_reason": null,
+      "flagged": 1,
+      "flag_reason": "this is about UFOs",
       "manually_added": 0
     },
     {
@@ -1533,6 +1533,42 @@
   ],
   "youtube_videos": [],
   "collection_log": [
+    {
+      "id": 20,
+      "run_date": "2026-04-13T12:50:14.140553",
+      "collector": "google_trends",
+      "status": "success",
+      "items_found": 0,
+      "items_new": 0,
+      "error": null
+    },
+    {
+      "id": 19,
+      "run_date": "2026-04-13T12:50:07.166142",
+      "collector": "reddit",
+      "status": "success",
+      "items_found": 60,
+      "items_new": 0,
+      "error": null
+    },
+    {
+      "id": 18,
+      "run_date": "2026-04-13T12:49:48.655156",
+      "collector": "discover_articles",
+      "status": "success",
+      "items_found": 0,
+      "items_new": 0,
+      "error": null
+    },
+    {
+      "id": 17,
+      "run_date": "2026-04-13T12:49:47.329531",
+      "collector": "seed_articles",
+      "status": "success",
+      "items_found": 7,
+      "items_new": 0,
+      "error": null
+    },
     {
       "id": 16,
       "run_date": "2026-04-13T12:35:56.496327",
