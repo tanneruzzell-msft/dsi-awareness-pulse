@@ -1,5 +1,329 @@
-{
-  "generated_at": "2026-04-13T13:48:08.323879",
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSI Awareness Pulse</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg: #0f1117; --surface: #1a1d27; --surface2: #22262f;
+            --border: #2d3140; --text: #e8ecf4; --text-muted: #8891a4;
+            --accent: #5b9aff; --green: #34d399; --yellow: #fbbf24;
+            --red: #f87171; --purple: #a78bfa; --orange: #fb923c;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg); color: var(--text); line-height: 1.5;
+        }
+
+        /* Layout */
+        .topbar {
+            background: var(--surface); border-bottom: 1px solid var(--border);
+            padding: 12px 32px; display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .topbar h1 { font-size: 18px; font-weight: 600; }
+        .topbar h1 span { color: var(--accent); }
+        .topbar .meta { color: var(--text-muted); font-size: 12px; }
+        .main { max-width: 1400px; margin: 0 auto; padding: 24px 32px; }
+
+        /* Score cards */
+        .scores { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 28px; }
+        .score-card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+            padding: 20px; position: relative; overflow: hidden;
+        }
+        .score-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        }
+        .score-card.awareness::before { background: linear-gradient(90deg, var(--red), var(--yellow), var(--green)); }
+        .score-card.favorability::before { background: var(--green); }
+        .score-card.articles::before { background: var(--accent); }
+        .score-card.reddit::before { background: var(--orange); }
+        .score-card.flagged::before { background: var(--red); }
+        .score-card .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 6px; }
+        .score-card .value { font-size: 36px; font-weight: 700; line-height: 1; }
+        .score-card .sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+        .score-card .value.green { color: var(--green); }
+        .score-card .value.yellow { color: var(--yellow); }
+        .score-card .value.red { color: var(--red); }
+        .score-card .value.accent { color: var(--accent); }
+        .score-card .value.orange { color: var(--orange); }
+
+        /* Tabs */
+        .tabs { display: flex; gap: 2px; margin-bottom: 24px; background: var(--surface); border-radius: 10px; padding: 4px; width: fit-content; }
+        .tab-btn {
+            padding: 8px 20px; border: none; background: none; color: var(--text-muted);
+            border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s;
+        }
+        .tab-btn:hover { color: var(--text); }
+        .tab-btn.active { background: var(--accent); color: #000; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* Cards */
+        .card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 12px; padding: 24px; margin-bottom: 20px;
+        }
+        .card h2 { font-size: 14px; font-weight: 600; color: var(--text-muted); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .chart-wrap { height: 280px; position: relative; }
+
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { text-align: left; padding: 10px 12px; color: var(--text-muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border); }
+        td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        tr:hover { background: var(--surface2); }
+        tr.flagged { opacity: 0.35; }
+        td a { color: var(--accent); text-decoration: none; }
+        td a:hover { text-decoration: underline; }
+
+        /* Badges */
+        .badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .badge.positive { background: #0d3320; color: var(--green); }
+        .badge.mixed { background: #332b0d; color: var(--yellow); }
+        .badge.negative { background: #330d0d; color: var(--red); }
+        .badge.unknown { background: #1a1d27; color: var(--text-muted); border: 1px solid var(--border); }
+        .badge.tp { background: #0d1f33; color: var(--accent); }
+        .badge.ms { background: #1f0d33; color: var(--purple); }
+        .badge.manual { background: #0d3320; color: var(--green); }
+        .badge.flag-reason { background: #330d0d; color: var(--red); font-weight: 400; }
+
+        /* Buttons */
+        .btn { padding: 6px 14px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); cursor: pointer; font-size: 12px; transition: all 0.15s; }
+        .btn:hover { border-color: var(--accent); color: var(--accent); }
+        .btn.danger:hover { border-color: var(--red); color: var(--red); }
+        .btn.primary { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }
+        .btn.primary:hover { opacity: 0.85; }
+        .btn.sm { padding: 3px 8px; font-size: 11px; }
+
+        .flag-btn { background: none; border: 1px solid transparent; color: var(--text-muted); cursor: pointer; padding: 3px 8px; border-radius: 4px; font-size: 12px; }
+        .flag-btn:hover { border-color: var(--red); color: var(--red); }
+        .unflag-btn:hover { border-color: var(--green); color: var(--green); }
+
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 24px; right: 24px; background: var(--surface);
+            border: 1px solid var(--green); color: var(--text); padding: 14px 24px;
+            border-radius: 10px; font-size: 13px; z-index: 200;
+            transform: translateY(100px); opacity: 0; transition: all 0.3s;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.error { border-color: var(--red); }
+
+        /* Add form */
+        .add-form { display: grid; grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr auto; gap: 10px; align-items: end; }
+        .add-form label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .add-form input, .add-form select {
+            width: 100%; padding: 8px 12px; background: var(--bg); border: 1px solid var(--border);
+            border-radius: 6px; color: var(--text); font-size: 13px;
+        }
+        .add-form input:focus, .add-form select:focus { outline: none; border-color: var(--accent); }
+
+        /* Filter bar */
+        .filter-bar { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; }
+        .filter-bar select, .filter-bar input {
+            padding: 6px 12px; background: var(--bg); border: 1px solid var(--border);
+            border-radius: 6px; color: var(--text); font-size: 12px;
+        }
+
+        .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+        .status-dot.live { background: var(--green); }
+
+        @media (max-width: 900px) {
+            .scores { grid-template-columns: repeat(2, 1fr); }
+            .add-form { grid-template-columns: 1fr; }
+            .main { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <h1><span>📡</span> DSI Awareness Pulse</h1>
+    <div style="display:flex;gap:16px;align-items:center">
+        <span class="meta"><span class="status-dot live"></span>Last updated: <span id="last-updated">—</span></span>
+        <span class="badge unknown" style="padding:6px 12px">📤 Shared View (read-only)</span>
+    </div>
+</div>
+
+<div class="main">
+    <!-- Scorecards -->
+    <div class="scores">
+        <div class="score-card awareness">
+            <div class="label">Awareness Score</div>
+            <div class="value yellow" id="sc-awareness">—</div>
+            <div class="sub">composite (target: 60%+)</div>
+        </div>
+        <div class="score-card favorability">
+            <div class="label">Favorability</div>
+            <div class="value green" id="sc-favorability">—</div>
+            <div class="sub">positive + mixed sentiment</div>
+        </div>
+        <div class="score-card articles">
+            <div class="label">Articles Tracked</div>
+            <div class="value accent" id="sc-articles">0</div>
+            <div class="sub" id="sc-articles-sub">0 third-party, 0 Microsoft</div>
+        </div>
+        <div class="score-card reddit">
+            <div class="label">Reddit Mentions</div>
+            <div class="value orange" id="sc-reddit">0</div>
+            <div class="sub" id="sc-reddit-sub">across 0 subreddits</div>
+        </div>
+        <div class="score-card flagged">
+            <div class="label">LinkedIn Posts</div>
+            <div class="value accent" id="sc-linkedin">0</div>
+            <div class="sub">add via ➕ tab</div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="trends">📈 Trends</button>
+        <button class="tab-btn" data-tab="articles">📰 Articles</button>
+        <button class="tab-btn" data-tab="reddit">💬 Reddit</button>
+        <button class="tab-btn" data-tab="linkedin">💼 LinkedIn</button>
+        <button class="tab-btn" data-tab="add">➕ Add Entry</button>
+        <button class="tab-btn" data-tab="benchmark">🏆 Benchmark</button>
+        <button class="tab-btn" data-tab="history">📊 History</button>
+        <button class="tab-btn" data-tab="methodology">✅ Methodology</button>
+    </div>
+
+    <!-- Trends -->
+    <div class="tab-panel active" id="panel-trends">
+        <div class="card"><h2>Google Trends — Interest Over Time</h2><div class="chart-wrap"><canvas id="trends-chart"></canvas></div></div>
+    </div>
+
+    <!-- Articles -->
+    <div class="tab-panel" id="panel-articles">
+        <div class="card">
+            <h2>All Tracked Articles</h2>
+            <div class="filter-bar">
+                <select id="filter-article-type" onchange="renderArticles()">
+                    <option value="all">All types</option>
+                    <option value="third_party">Third-party only</option>
+                    <option value="microsoft">Microsoft only</option>
+                </select>
+                <select id="filter-article-flag" onchange="renderArticles()">
+                    <option value="unflagged">Unflagged only</option>
+                    <option value="all">Show all</option>
+                    <option value="flagged">Flagged only</option>
+                </select>
+            </div>
+            <table><thead><tr><th></th><th>Title</th><th>Source</th><th>Type</th><th>Sentiment</th><th>Published</th></tr></thead>
+            <tbody id="articles-tbody"></tbody></table>
+        </div>
+    </div>
+
+    <!-- Reddit -->
+    <div class="tab-panel" id="panel-reddit">
+        <div class="card">
+            <h2>Reddit Mentions</h2>
+            <div class="filter-bar">
+                <select id="filter-reddit-flag" onchange="renderReddit()">
+                    <option value="unflagged">Unflagged only</option>
+                    <option value="all">Show all</option>
+                    <option value="flagged">Flagged only</option>
+                </select>
+                <input type="text" id="filter-reddit-search" placeholder="Search titles..." oninput="renderReddit()" style="width:200px" />
+            </div>
+            <div id="reddit-content"></div>
+        </div>
+    </div>
+
+    <!-- LinkedIn -->
+    <div class="tab-panel" id="panel-linkedin">
+        <div class="card">
+            <h2>LinkedIn Posts Mentioning DSI</h2>
+            <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px">LinkedIn doesn't have a public search API, so posts are added manually when your team spots them. Use the ➕ tab to add a LinkedIn post URL.</p>
+            <div id="linkedin-content"></div>
+        </div>
+    </div>
+
+    <!-- Add Entry -->
+    <div class="tab-panel" id="panel-add">
+        <div class="card">
+            <h2>Add a Missed Article, Video, or Post</h2>
+            <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px">Found something about DSI that the collector missed? Add it here.</p>
+            <div class="add-form">
+                <div><label>URL *</label><input type="text" id="add-url" placeholder="https://..." /></div>
+                <div><label>Title</label><input type="text" id="add-title" placeholder="Article title" /></div>
+                <div><label>Source</label><input type="text" id="add-source" placeholder="e.g. TechCrunch" /></div>
+                <div><label>Sentiment</label><select id="add-sentiment"><option value="unknown">Unknown</option><option value="positive">Positive</option><option value="mixed">Mixed</option><option value="negative">Negative</option></select></div>
+                <div><label>Published</label><input type="date" id="add-published" /></div>
+                <div><button class="btn primary" onclick="addEntry()" style="margin-top:18px">Add</button></div>
+            </div>
+            <p id="add-result" style="margin-top:12px;font-size:13px"></p>
+        </div>
+    </div>
+
+    <!-- Benchmark -->
+    <div class="tab-panel" id="panel-benchmark">
+        <div class="card">
+            <h2>Competitive Awareness Benchmark</h2>
+            <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px">Compares Reddit mentions + Google Trends interest across competitors. These are the two signals measurable for everyone. DSI's full score (including articles, MS content) is shown separately on the main dashboard.</p>
+            <div class="chart-wrap" style="height:350px"><canvas id="benchmark-chart"></canvas></div>
+        </div>
+        <div class="card">
+            <h2>Detailed Comparison</h2>
+            <table>
+                <thead><tr><th>Product</th><th>Reddit Posts</th><th>Reddit Score</th><th>Trends Avg</th><th>Benchmark Score</th><th>Gap vs DSI</th></tr></thead>
+                <tbody id="benchmark-tbody"></tbody>
+            </table>
+            <p style="color:var(--text-muted);font-size:11px;margin-top:12px">Benchmark data collected via PullPush (Reddit archive) + Google Trends. Run <code>python benchmark.py</code> to refresh.</p>
+        </div>
+        <div class="card">
+            <h2>Where DSI Can Close the Gap</h2>
+            <div id="benchmark-insights"></div>
+        </div>
+    </div>
+
+    <!-- History -->
+    <div class="tab-panel" id="panel-history">
+        <div class="card"><h2>Awareness Score Over Time</h2><div class="chart-wrap"><canvas id="history-chart"></canvas></div></div>
+        <div class="card">
+            <h2>Snapshot History</h2>
+            <table><thead><tr><th>Date</th><th>Awareness</th><th>Favorability</th><th>Articles</th><th>Reddit</th><th>Trends Avg</th><th>Composite</th></tr></thead>
+            <tbody id="history-tbody"></tbody></table>
+        </div>
+    </div>
+
+    <!-- Methodology -->
+    <div class="tab-panel" id="panel-methodology">
+        <div class="card">
+            <h2>Data Sources & Verification</h2>
+            <p style="color:var(--text-muted);margin-bottom:16px">Every data point is from a public, verifiable source. Click any link to confirm.</p>
+            <table><thead><tr><th>Signal</th><th>Source</th><th>Method</th><th>Verify</th></tr></thead><tbody>
+                <tr><td>Articles</td><td>DuckDuckGo + manual seed</td><td>Web search for DSI keywords</td><td><a href="https://duckduckgo.com/?q=%22Microsoft+Purview+Data+Security+Investigations%22" target="_blank">Search →</a></td></tr>
+                <tr><td>Reddit</td><td>PullPush archive API</td><td>Full Reddit archive search (no auth needed)</td><td><a href="https://www.reddit.com/search/?q=%22data+security+investigations%22+purview" target="_blank">Search →</a></td></tr>
+                <tr><td>Google Trends</td><td>Google Trends via pytrends</td><td>Interest-over-time for tracked keywords</td><td><a href="https://trends.google.com/trends/explore?q=%22data+security+investigations%22" target="_blank">Check →</a></td></tr>
+                <tr><td>Sentiment</td><td>Manual classification</td><td>Each article read and tagged</td><td>Click any article link</td></tr>
+            </tbody></table>
+
+            <h2 style="margin-top:24px">Scoring Methodology</h2>
+            <table><thead><tr><th>Component</th><th>Weight</th><th>Scoring</th></tr></thead><tbody>
+                <tr><td>Third-party articles</td><td>25%</td><td>2.5 pts per article, max 10</td></tr>
+                <tr><td>Reddit mentions</td><td>20%</td><td>2 pts per mention, max 10</td></tr>
+                <tr><td>Google Trends (30d avg)</td><td>20%</td><td>Interest / 10, max 10</td></tr>
+                <tr><td>Microsoft content</td><td>20%</td><td>1.5 pts per post, max 10</td></tr>
+                <tr><td>YouTube videos</td><td>15%</td><td>3 pts per video, max 10</td></tr>
+            </tbody></table>
+            <p style="color:var(--text-muted);font-size:12px;margin-top:8px">Favorability = (positive + mixed×0.5) / total_rated × 100. Flagged entries excluded from all scores.</p>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let DATA = {};
+
+async function loadData() {
+    DATA = {
+  "generated_at": "2026-04-13T13:48:46.331923",
   "latest_snapshot": {
     "id": 11,
     "snapshot_date": "2026-04-13",
@@ -1560,234 +1884,399 @@
       "interest": 11
     }
   ],
-  "youtube_videos": [],
-  "collection_log": [
-    {
-      "id": 24,
-      "run_date": "2026-04-13T13:30:52.783154",
-      "collector": "google_trends",
-      "status": "success",
-      "items_found": 0,
-      "items_new": 0,
-      "error": null
-    },
-    {
-      "id": 23,
-      "run_date": "2026-04-13T13:30:46.005297",
-      "collector": "reddit",
-      "status": "success",
-      "items_found": 60,
-      "items_new": 0,
-      "error": null
-    },
-    {
-      "id": 22,
-      "run_date": "2026-04-13T13:30:27.446227",
-      "collector": "discover_articles",
-      "status": "success",
-      "items_found": 0,
-      "items_new": 0,
-      "error": null
-    },
-    {
-      "id": 21,
-      "run_date": "2026-04-13T13:30:26.053253",
-      "collector": "seed_articles",
-      "status": "success",
-      "items_found": 8,
-      "items_new": 1,
-      "error": null
-    },
-    {
-      "id": 20,
-      "run_date": "2026-04-13T12:50:14.140553",
-      "collector": "google_trends",
-      "status": "success",
-      "items_found": 0,
-      "items_new": 0,
-      "error": null
-    },
-    {
-      "id": 19,
-      "run_date": "2026-04-13T12:50:07.166142",
-      "collector": "reddit",
-      "status": "success",
-      "items_found": 60,
-      "items_new": 0,
-      "error": null
-    },
-    {
-      "id": 18,
-      "run_date": "2026-04-13T12:49:48.655156",
-      "collector": "discover_articles",
-      "status": "success",
-      "items_found": 0,
-      "items_new": 0,
-      "error": null
-    },
-    {
-      "id": 17,
-      "run_date": "2026-04-13T12:49:47.329531",
-      "collector": "seed_articles",
-      "status": "success",
-      "items_found": 7,
-      "items_new": 0,
-      "error": null
-    },
-    {
-      "id": 16,
-      "run_date": "2026-04-13T12:35:56.496327",
-      "collector": "google_trends",
-      "status": "success",
-      "items_found": 0,
-      "items_new": 0,
-      "error": null
-    },
-    {
-      "id": 15,
-      "run_date": "2026-04-13T12:35:47.132559",
-      "collector": "reddit",
-      "status": "success",
-      "items_found": 60,
-      "items_new": 0,
-      "error": null
-    },
-    {
-      "id": 14,
-      "run_date": "2026-04-13T12:35:28.837733",
-      "collector": "discover_articles",
-      "status": "success",
-      "items_found": 0,
-      "items_new": 0,
-      "error": null
-    },
-    {
-      "id": 13,
-      "run_date": "2026-04-13T12:35:27.512192",
-      "collector": "seed_articles",
-      "status": "success",
-      "items_found": 7,
-      "items_new": 0,
-      "error": null
-    },
-    {
-      "id": 12,
-      "run_date": "2026-04-13T12:31:58.142366",
-      "collector": "google_trends",
-      "status": "success",
-      "items_found": 0,
-      "items_new": 0,
-      "error": null
-    },
-    {
-      "id": 11,
-      "run_date": "2026-04-13T12:31:45.870683",
-      "collector": "reddit",
-      "status": "success",
-      "items_found": 60,
-      "items_new": 46,
-      "error": null
-    },
-    {
-      "id": 10,
-      "run_date": "2026-04-13T12:31:26.288885",
-      "collector": "discover_articles",
-      "status": "success",
-      "items_found": 0,
-      "items_new": 0,
-      "error": null
-    },
-    {
-      "id": 9,
-      "run_date": "2026-04-13T12:31:24.887715",
-      "collector": "seed_articles",
-      "status": "success",
-      "items_found": 7,
-      "items_new": 0,
-      "error": null
-    },
-    {
-      "id": 8,
-      "run_date": "2026-04-13T11:32:39.894423",
-      "collector": "google_trends",
-      "status": "success",
-      "items_found": 0,
-      "items_new": 0,
-      "error": null
-    },
-    {
-      "id": 7,
-      "run_date": "2026-04-13T11:32:28.474988",
-      "collector": "reddit",
-      "status": "success",
-      "items_found": 0,
-      "items_new": 0,
-      "error": null
-    },
-    {
-      "id": 6,
-      "run_date": "2026-04-13T11:32:20.293095",
-      "collector": "discover_articles",
-      "status": "success",
-      "items_found": 0,
-      "items_new": 0,
-      "error": null
-    },
-    {
-      "id": 5,
-      "run_date": "2026-04-13T11:32:18.886852",
-      "collector": "seed_articles",
-      "status": "success",
-      "items_found": 7,
-      "items_new": 0,
-      "error": null
-    },
-    {
-      "id": 4,
-      "run_date": "2026-04-13T11:28:40.584263",
-      "collector": "google_trends",
-      "status": "success",
-      "items_found": 0,
-      "items_new": 0,
-      "error": null
-    },
-    {
-      "id": 3,
-      "run_date": "2026-04-13T11:28:33.390982",
-      "collector": "reddit",
-      "status": "success",
-      "items_found": 0,
-      "items_new": 0,
-      "error": null
-    },
-    {
-      "id": 2,
-      "run_date": "2026-04-13T11:28:24.933903",
-      "collector": "discover_articles",
-      "status": "success",
-      "items_found": 0,
-      "items_new": 0,
-      "error": null
-    },
-    {
-      "id": 1,
-      "run_date": "2026-04-13T11:28:23.619189",
-      "collector": "seed_articles",
-      "status": "success",
-      "items_found": 7,
-      "items_new": 7,
-      "error": null
-    }
-  ],
   "summary": {
     "total_articles": 13,
     "third_party_articles": 9,
     "microsoft_articles": 4,
-    "reddit_total": 58,
-    "reddit_unique_subs": 32,
+    "reddit_total": 44,
+    "reddit_unique_subs": 22,
     "linkedin_total": 1,
-    "youtube_total": 0,
-    "trend_keywords_tracked": 1,
-    "snapshots_count": 1
+    "snapshots_count": 1,
+    "total_flagged": 14
   }
+};
+    render();
 }
+
+function render() {
+    const s = DATA.latest_snapshot || {};
+    const sum = DATA.summary || {};
+
+    document.getElementById('last-updated').textContent = DATA.generated_at ? new Date(DATA.generated_at).toLocaleString() : '—';
+
+    const aw = s.awareness_pct || 0;
+    const awEl = document.getElementById('sc-awareness');
+    awEl.textContent = aw + '%';
+    awEl.className = 'value ' + (aw >= 60 ? 'green' : aw >= 35 ? 'yellow' : 'red');
+
+    document.getElementById('sc-favorability').textContent = (s.favorability_pct || 0) + '%';
+    document.getElementById('sc-articles').textContent = sum.total_articles || 0;
+    document.getElementById('sc-articles-sub').textContent = `${sum.third_party_articles || 0} third-party, ${sum.microsoft_articles || 0} Microsoft`;
+    document.getElementById('sc-reddit').textContent = sum.reddit_total || 0;
+    document.getElementById('sc-reddit-sub').textContent = `across ${sum.reddit_unique_subs || 0} subreddits`;
+    document.getElementById('sc-linkedin').textContent = sum.linkedin_total || 0;
+
+    renderArticles();
+    renderReddit();
+    renderLinkedIn();
+    renderTrends();
+    renderHistory();
+}
+
+function renderArticles() {
+    const tbody = document.getElementById('articles-tbody');
+    const typeFilter = document.getElementById('filter-article-type').value;
+    const flagFilter = document.getElementById('filter-article-flag').value;
+
+    let items = (DATA.articles || []).filter(a => {
+        if (typeFilter !== 'all' && a.type !== typeFilter) return false;
+        if (flagFilter === 'unflagged' && a.flagged) return false;
+        if (flagFilter === 'flagged' && !a.flagged) return false;
+        return true;
+    });
+
+    if (items.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px">No matching articles</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = items.map(a => {
+        const cls = a.flagged ? ' class="flagged"' : '';
+        const btn = a.flagged
+            ? `<button class="flag-btn unflag-btn" onclick="unflagEntry('${a.id}')">↩</button>`
+            : `<button class="flag-btn" onclick="flagEntry('${a.id}')">🚩</button>`;
+        const badges = [];
+        if (a.flagged) badges.push(`<span class="badge flag-reason">${a.flag_reason || 'flagged'}</span>`);
+        if (a.manually_added) badges.push('<span class="badge manual">added</span>');
+        return `<tr${cls}><td>${btn} ${badges.join(' ')}</td><td><a href="${a.url}" target="_blank">${a.title}</a></td><td>${a.source}</td><td><span class="badge ${a.type === 'third_party' ? 'tp' : 'ms'}">${a.type === 'third_party' ? '3rd Party' : 'Microsoft'}</span></td><td><span class="badge ${a.sentiment}">${a.sentiment}</span></td><td>${a.published_date || '—'}</td></tr>`;
+    }).join('');
+}
+
+function renderReddit() {
+    const el = document.getElementById('reddit-content');
+    const flagFilter = document.getElementById('filter-reddit-flag').value;
+    const search = (document.getElementById('filter-reddit-search').value || '').toLowerCase();
+
+    let items = (DATA.reddit_mentions || []).filter(r => {
+        if (flagFilter === 'unflagged' && r.flagged) return false;
+        if (flagFilter === 'flagged' && !r.flagged) return false;
+        if (search && !r.title.toLowerCase().includes(search) && !r.subreddit.toLowerCase().includes(search)) return false;
+        return true;
+    });
+
+    if (items.length === 0) {
+        el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted)">No matching Reddit mentions</div>';
+        return;
+    }
+
+    el.innerHTML = '<table><thead><tr><th></th><th>Subreddit</th><th>Title</th><th>Score</th><th>Comments</th><th>Date</th></tr></thead><tbody>' +
+        items.map(r => {
+            const cls = r.flagged ? ' class="flagged"' : '';
+            const btn = r.flagged
+                ? `<button class="flag-btn unflag-btn" onclick="unflagEntry('${r.id}')">↩</button>`
+                : `<button class="flag-btn" onclick="flagEntry('${r.id}')">🚩</button>`;
+            const badges = [];
+            if (r.flagged) badges.push(`<span class="badge flag-reason">${r.flag_reason || 'flagged'}</span>`);
+            if (r.manually_added) badges.push('<span class="badge manual">added</span>');
+            const dt = r.created_utc > 0 ? new Date(r.created_utc * 1000).toLocaleDateString() : '—';
+            return `<tr${cls}><td>${btn} ${badges.join(' ')}</td><td>r/${r.subreddit}</td><td><a href="${r.url}" target="_blank">${r.title}</a></td><td>${r.score}</td><td>${r.num_comments}</td><td>${dt}</td></tr>`;
+        }).join('') + '</tbody></table>';
+}
+
+function renderLinkedIn() {
+    const el = document.getElementById('linkedin-content');
+    const items = (DATA.linkedin_posts || []);
+
+    if (items.length === 0) {
+        el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted)"><div style="font-size:28px;margin-bottom:8px">💼</div>No LinkedIn posts tracked yet.<br><span style="font-size:12px">Paste a LinkedIn post URL in the ➕ Add Entry tab — the "Source" field becomes the author name.</span></div>';
+        return;
+    }
+
+    el.innerHTML = '<table><thead><tr><th></th><th>Title / Content</th><th>Author</th><th>Added</th></tr></thead><tbody>' +
+        items.map(p => {
+            const cls = p.flagged ? ' class="flagged"' : '';
+            const btn = p.flagged
+                ? `<button class="flag-btn unflag-btn" onclick="unflagEntry('${p.id}')">↩</button>`
+                : `<button class="flag-btn" onclick="flagEntry('${p.id}')">🚩</button>`;
+            return `<tr${cls}><td>${btn}</td><td><a href="${p.url}" target="_blank">${p.title}</a></td><td>${p.author || '—'}</td><td>${p.discovered}</td></tr>`;
+        }).join('') + '</tbody></table>';
+}
+
+function renderTrends() {
+    const ctx = document.getElementById('trends-chart');
+    if (!DATA.google_trends || DATA.google_trends.length === 0) {
+        ctx.parentElement.innerHTML = '<div style="text-align:center;padding:60px;color:var(--text-muted)">No Google Trends data yet — will populate after next collection run</div>';
+        return;
+    }
+    const keywords = [...new Set(DATA.google_trends.map(t => t.keyword))];
+    const colors = ['#5b9aff', '#a78bfa', '#34d399', '#fbbf24', '#f87171'];
+    new Chart(ctx, {
+        type: 'line',
+        data: { datasets: keywords.map((kw, i) => ({
+            label: kw, data: DATA.google_trends.filter(t => t.keyword === kw).map(p => ({ x: p.date, y: p.interest })),
+            borderColor: colors[i % colors.length], backgroundColor: colors[i % colors.length] + '15',
+            fill: true, tension: 0.3, pointRadius: 1.5, borderWidth: 2
+        }))},
+        options: { responsive: true, maintainAspectRatio: false, scales: {
+            x: { type: 'category', grid: { color: '#2d3140' }, ticks: { color: '#8891a4', maxTicksLimit: 12, font: { size: 11 } } },
+            y: { grid: { color: '#2d3140' }, ticks: { color: '#8891a4', font: { size: 11 } }, min: 0, max: 100 }
+        }, plugins: { legend: { labels: { color: '#e8ecf4', font: { size: 12 } } } } }
+    });
+}
+
+function renderHistory() {
+    const snapshots = DATA.snapshots || [];
+    if (snapshots.length > 0) {
+        new Chart(document.getElementById('history-chart'), {
+            type: 'line',
+            data: { labels: snapshots.map(s => s.snapshot_date), datasets: [
+                { label: 'Awareness %', data: snapshots.map(s => s.awareness_pct), borderColor: '#fbbf24', backgroundColor: '#fbbf2415', fill: true, tension: 0.3, borderWidth: 2 },
+                { label: 'Favorability %', data: snapshots.map(s => s.favorability_pct), borderColor: '#34d399', backgroundColor: '#34d39915', fill: true, tension: 0.3, borderWidth: 2 }
+            ]},
+            options: { responsive: true, maintainAspectRatio: false, scales: {
+                x: { grid: { color: '#2d3140' }, ticks: { color: '#8891a4', font: { size: 11 } } },
+                y: { grid: { color: '#2d3140' }, ticks: { color: '#8891a4', font: { size: 11 } }, min: 0, max: 100 }
+            }, plugins: { legend: { labels: { color: '#e8ecf4' } } } }
+        });
+    }
+    document.getElementById('history-tbody').innerHTML = snapshots.slice().reverse().map(s =>
+        `<tr><td>${s.snapshot_date}</td><td>${s.awareness_pct}%</td><td>${s.favorability_pct}%</td><td>${s.total_articles} (${s.third_party_articles} 3P)</td><td>${s.reddit_mentions}</td><td>${s.google_trends_avg}</td><td>${s.composite_score}/10</td></tr>`
+    ).join('');
+}
+
+// --- Benchmark ---
+
+let BENCHMARK = {};
+
+async function loadBenchmark() {
+    BENCHMARK = {
+  "generated_at": "2026-04-13T13:46:55.334868",
+  "competitors": {
+    "DSI (Purview)": {
+      "reddit_posts": 45,
+      "reddit_score": 716,
+      "trends_avg": 14,
+      "composite": 5.7,
+      "awareness_pct": 57,
+      "full_awareness_pct": 58.8,
+      "source": "live_db"
+    },
+    "Relativity": {
+      "reddit_posts": 138,
+      "reddit_score": 330,
+      "trends_avg": 5,
+      "composite": 5.3,
+      "awareness_pct": 53
+    },
+    "Nuix": {
+      "reddit_posts": 53,
+      "reddit_score": 342,
+      "trends_avg": 35,
+      "composite": 6.8,
+      "awareness_pct": 68
+    },
+    "Everlaw": {
+      "reddit_posts": 100,
+      "reddit_score": 165,
+      "trends_avg": 29,
+      "composite": 6.5,
+      "awareness_pct": 65
+    },
+    "Exterro": {
+      "reddit_posts": 45,
+      "reddit_score": 93,
+      "trends_avg": 15,
+      "composite": 5.8,
+      "awareness_pct": 58
+    },
+    "DTEX": {
+      "reddit_posts": 50,
+      "reddit_score": 74,
+      "trends_avg": 6,
+      "composite": 5.3,
+      "awareness_pct": 53
+    },
+    "Varonis": {
+      "reddit_posts": 105,
+      "reddit_score": 483,
+      "trends_avg": 42,
+      "composite": 7.1,
+      "awareness_pct": 71
+    },
+    "Cyberhaven": {
+      "reddit_posts": 70,
+      "reddit_score": 70,
+      "trends_avg": 14,
+      "composite": 5.7,
+      "awareness_pct": 57
+    }
+  }
+};
+    renderBenchmark();
+}
+
+function renderBenchmark() {
+    const comps = BENCHMARK.competitors || {};
+    const names = Object.keys(comps);
+    if (names.length === 0) return;
+
+    // Sort by awareness descending
+    const sorted = names.sort((a, b) => (comps[b].awareness_pct || 0) - (comps[a].awareness_pct || 0));
+    const dsiData = comps['DSI (Purview)'] || {};
+
+    // Bar chart
+    const colors = sorted.map(n => n === 'DSI (Purview)' ? '#5b9aff' : '#3b3f4f');
+    const borderColors = sorted.map(n => n === 'DSI (Purview)' ? '#5b9aff' : '#555a6e');
+
+    const ctx = document.getElementById('benchmark-chart');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: sorted,
+            datasets: [
+                {
+                    label: 'Reddit Posts',
+                    data: sorted.map(n => comps[n].reddit_posts || 0),
+                    backgroundColor: sorted.map(n => n === 'DSI (Purview)' ? '#fb923c' : '#4a3520'),
+                    borderColor: sorted.map(n => n === 'DSI (Purview)' ? '#fb923c' : '#6b5030'),
+                    borderWidth: 1
+                },
+                {
+                    label: 'Google Trends Avg',
+                    data: sorted.map(n => comps[n].trends_avg || 0),
+                    backgroundColor: sorted.map(n => n === 'DSI (Purview)' ? '#5b9aff' : '#1f2a3f'),
+                    borderColor: sorted.map(n => n === 'DSI (Purview)' ? '#5b9aff' : '#3a4a6f'),
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            indexAxis: 'y',
+            scales: {
+                x: { grid: { color: '#2d3140' }, ticks: { color: '#8891a4' }, stacked: false },
+                y: { grid: { color: '#2d3140' }, ticks: { color: '#e8ecf4', font: { size: 13, weight: n => n === 'DSI (Purview)' ? '700' : '400' } } }
+            },
+            plugins: { legend: { labels: { color: '#e8ecf4' } } }
+        }
+    });
+
+    // Table
+    const tbody = document.getElementById('benchmark-tbody');
+    tbody.innerHTML = sorted.map(name => {
+        const c = comps[name];
+        const isDSI = name === 'DSI (Purview)';
+        const gap = isDSI ? '—' : `${c.reddit_posts - (dsiData.reddit_posts || 0)} posts, ${(c.trends_avg || 0) - (dsiData.trends_avg || 0)} trends pts`;
+        const style = isDSI ? ' style="background:var(--surface2);font-weight:600"' : '';
+        const fullScore = isDSI && c.full_awareness_pct ? ` <span style="color:var(--green);font-size:11px">(full: ${c.full_awareness_pct}%)</span>` : '';
+        return `<tr${style}>
+            <td>${name}${isDSI ? ' ◀' : ''}</td>
+            <td>${c.reddit_posts}</td>
+            <td>${c.reddit_score}</td>
+            <td>${c.trends_avg}</td>
+            <td>${c.awareness_pct}%${fullScore}</td>
+            <td style="color:var(--text-muted);font-size:12px">${gap}</td>
+        </tr>`;
+    }).join('');
+
+    // Insights
+    const insights = document.getElementById('benchmark-insights');
+    const redditGap = Math.max(...sorted.filter(n => n !== 'DSI (Purview)').map(n => comps[n].reddit_posts)) - (dsiData.reddit_posts || 0);
+    const trendsAvg = sorted.filter(n => n !== 'DSI (Purview)').reduce((sum, n) => sum + (comps[n].trends_avg || 0), 0) / (sorted.length - 1);
+    const dsiTrends = dsiData.trends_avg || 0;
+
+    const closestAbove = sorted.filter(n => n !== 'DSI (Purview)' && (comps[n].awareness_pct || 0) > (dsiData.awareness_pct || 0))
+        .sort((a, b) => (comps[a].awareness_pct || 0) - (comps[b].awareness_pct || 0))[0];
+    const closestData = closestAbove ? comps[closestAbove] : null;
+
+    insights.innerHTML = `
+        <table style="margin-top:8px"><tbody>
+            <tr><td style="width:160px;color:var(--text-muted)">Biggest gap</td>
+                <td><strong>Reddit presence.</strong> DSI has ${dsiData.reddit_posts || 0} posts vs competitor avg of ${Math.round(sorted.filter(n=>n!=='DSI (Purview)').reduce((s,n)=>s+(comps[n].reddit_posts||0),0)/(sorted.length-1))}. One organic r/sysadmin or r/cybersecurity post with good engagement would meaningfully move your score.</td></tr>
+            <tr><td style="color:var(--text-muted)">Trends comparison</td>
+                <td>DSI trends interest (${dsiTrends}) is ${dsiTrends >= trendsAvg ? 'at or above' : 'below'} competitor avg (${Math.round(trendsAvg)}). ${dsiTrends >= trendsAvg ? 'Search curiosity exists — the conversion to community discussion is the gap.' : 'Both search interest and community presence need work.'}</td></tr>
+            ${closestData ? `<tr><td style="color:var(--text-muted)">Next target</td>
+                <td>Closest competitor above you: <strong>${closestAbove}</strong> at ${closestData.awareness_pct}%. Gap: ${closestData.reddit_posts - (dsiData.reddit_posts||0)} Reddit posts and ${closestData.trends_avg - dsiTrends} trends points.</td></tr>` : ''}
+            <tr><td style="color:var(--text-muted)">Quick win</td>
+                <td>A single well-received Reddit post (like a "How I investigated a breach with DSI" story on r/sysadmin) could add 10-20 posts worth of engagement through comments and cross-posts.</td></tr>
+        </tbody></table>
+    `;
+}
+
+// --- Actions ---
+
+async function flagEntry(id) { showToast('Read-only view. Use the live dashboard (start-dashboard.ps1) to flag entries.', true); return; /* 
+    const reason = prompt('Why is this a false positive?');
+    if (reason === null) return;
+    const resp = await fetch('/api/flag', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, reason: reason || 'false positive' }) });
+    const result = await resp.json();
+    if (result.ok) { showToast('Flagged + learned pattern — future runs will filter similar entries'); loadData(); }
+    else showToast('Failed to flag', true);
+}
+
+async function unflagEntry(id) { showToast('Read-only view. Use the live dashboard to unflag.', true); return; /* 
+    const resp = await fetch('/api/unflag', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+    const result = await resp.json();
+    if (result.ok) { showToast('Unflagged — included in scores again'); loadData(); }
+}
+
+async function addEntry() { showToast('Read-only view. Use the live dashboard to add entries.', true); return; /* 
+    const url = document.getElementById('add-url').value.trim();
+    if (!url) { showToast('URL is required', true); return; }
+    const body = {
+        url, title: document.getElementById('add-title').value.trim(),
+        source: document.getElementById('add-source').value.trim(),
+        sentiment: document.getElementById('add-sentiment').value,
+        published_date: document.getElementById('add-published').value || null
+    };
+    const resp = await fetch('/api/add', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const result = await resp.json();
+    if (result.ok) {
+        showToast('Added + config updated — future runs will find similar entries');
+        document.getElementById('add-url').value = '';
+        document.getElementById('add-title').value = '';
+        document.getElementById('add-source').value = '';
+        loadData();
+    } else {
+        showToast(result.error || 'Failed to add', true);
+    }
+}
+
+async function refreshData() { showToast('Read-only view. Use the live dashboard to refresh data.', true); return; /* 
+    const btn = document.getElementById('refresh-btn');
+    btn.textContent = '⏳ Collecting...';
+    btn.disabled = true;
+    try {
+        const resp = await fetch('/api/refresh', { method: 'POST' });
+        const result = await resp.json();
+        if (result.ok) { showToast('Collection complete!'); loadData(); }
+        else showToast('Collection had errors — check logs', true);
+    } catch (e) {
+        showToast('Refresh failed: ' + e.message, true);
+    }
+    btn.textContent = '🔄 Refresh Data';
+    btn.disabled = false;
+}
+
+function showToast(msg, isError) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show' + (isError ? ' error' : '');
+    setTimeout(() => t.className = 'toast', 3500);
+}
+
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+    });
+});
+
+loadData();
+loadBenchmark();
+</script>
+</body>
+</html>
